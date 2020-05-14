@@ -14,7 +14,7 @@ afterEvaluate { project ->
     }
 
     task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
+        classifier = 'sources1'
         from android.sourceSets.main.java.srcDirs
     }
 
