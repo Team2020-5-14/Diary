@@ -243,6 +243,141 @@
                     android:text="@string/setting_system_fix_dir_button" />
 
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/setting_content_margin_top"
+                android:background="@drawable/dash_line"
+                android:layerType="software" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/setting_group_margin_top"
+                android:text="应用锁"
+                android:textColor="@android:color/black"
+                android:textSize="28dp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/setting_group_margin_top"
+                android:layout_marginTop="@dimen/setting_content_margin_top"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="设置应用锁，保护你的隐私"
+                    android:textColor="@color/setting_hint_text_color"
+                    android:textSize="16dp" />
+
+                <com.ynu.diary.shared.gui.MyDiaryButton
+                    android:id="@+id/IV_main_setting_setting_security"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:text="设置应用锁" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/setting_content_margin_top"
+                android:background="@drawable/dash_line"
+                android:layerType="software" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/setting_group_margin_top"
+                android:text="备份与恢复"
+                android:textColor="@android:color/black"
+                android:textSize="28dp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/setting_group_margin_top"
+                android:layout_marginTop="@dimen/setting_content_margin_top"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="备份与恢复"
+                    android:textColor="@color/setting_hint_text_color"
+                    android:textSize="16dp" />
+
+                <com.ynu.diary.shared.gui.MyDiaryButton
+                    android:id="@+id/IV_main_setting_backup"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:text="备份与恢复" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/setting_content_margin_top"
+                android:background="@drawable/dash_line"
+                android:layerType="software" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/setting_group_margin_top"
+                android:text="关于"
+                android:textColor="@android:color/black"
+                android:textSize="28dp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/setting_group_margin_top"
+                android:layout_marginTop="@dimen/setting_content_margin_top"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="关于"
+                    android:textColor="@color/setting_hint_text_color"
+                    android:textSize="16dp" />
+
+                <com.ynu.diary.shared.gui.MyDiaryButton
+                    android:id="@+id/IV_main_setting_about"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:text="关于" />
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

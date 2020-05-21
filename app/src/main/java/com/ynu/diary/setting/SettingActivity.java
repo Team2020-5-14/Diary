@@ -14,16 +14,20 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.yalantis.ucrop.UCrop;
 import com.ynu.diary.R;
+import com.ynu.diary.backup.BackupActivity;
+import com.ynu.diary.main.AboutActivity;
+import com.ynu.diary.security.PasswordActivity;
 import com.ynu.diary.shared.ColorTools;
 import com.ynu.diary.shared.FileManager;
+import com.ynu.diary.shared.MyDiaryApplication;
 import com.ynu.diary.shared.OldVersionHelper;
 import com.ynu.diary.shared.PermissionHelper;
 import com.ynu.diary.shared.SPFManager;
 import com.ynu.diary.shared.ScreenHelper;
 import com.ynu.diary.shared.ThemeManager;
 import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
-import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +69,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner SP_setting_theme, SP_setting_language;
     private ImageView IV_setting_profile_bg, IV_setting_theme_main_color, IV_setting_theme_dark_color;
     private Button But_setting_theme_default_bg, But_setting_theme_default, But_setting_theme_apply;
-    private Button But_setting_fix_photo_17_dir;
+    private Button But_setting_fix_photo_17_dir, IV_main_setting_setting_security, IV_main_setting_about, IV_main_setting_backup;
 
 
     @Override
@@ -94,6 +98,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
         But_setting_fix_photo_17_dir = (Button) findViewById(R.id.But_setting_fix_photo_17_dir);
         But_setting_fix_photo_17_dir.setOnClickListener(this);
+        IV_main_setting_setting_security = (Button) findViewById(R.id.IV_main_setting_setting_security);
+        IV_main_setting_setting_security.setOnClickListener(this);
+        IV_main_setting_about = (Button) findViewById(R.id.IV_main_setting_about);
+        IV_main_setting_about.setOnClickListener(this);
+        IV_main_setting_backup = (Button) findViewById(R.id.IV_main_setting_backup);
+        IV_main_setting_backup.setOnClickListener(this);
 
         initSpinner();
         initTheme(themeManager.getCurrentTheme());
@@ -315,6 +325,23 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 SettingColorPickerFragment secColorPickerFragment =
                         SettingColorPickerFragment.newInstance(themeManager.getThemeDarkColor(this), R.id.IV_setting_theme_dark_color);
                 secColorPickerFragment.show(getSupportFragmentManager(), "secColorPickerFragment");
+                break;
+            case R.id.IV_main_setting_setting_security:
+                Intent securityPageIntent = new Intent(this, PasswordActivity.class);
+                if (((MyDiaryApplication) this.getApplication()).isHasPassword()) {
+                    securityPageIntent.putExtra("password_mode", PasswordActivity.REMOVE_PASSWORD);
+                } else {
+                    securityPageIntent.putExtra("password_mode", PasswordActivity.CREATE_PASSWORD);
+                }
+                this.startActivity(securityPageIntent);
+                break;
+            case R.id.IV_main_setting_about:
+                Intent aboutPageIntent = new Intent(this, AboutActivity.class);
+                this.startActivity(aboutPageIntent);
+                break;
+            case R.id.IV_main_setting_backup:
+                Intent backupIntent = new Intent(this, BackupActivity.class);
+                this.startActivity(backupIntent);
                 break;
             case R.id.But_setting_fix_photo_17_dir:
                 //The new diary dir was updated in version 17

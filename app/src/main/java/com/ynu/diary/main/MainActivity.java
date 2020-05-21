@@ -1,5 +1,6 @@
 package com.ynu.diary.main;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -34,6 +35,7 @@ import com.ynu.diary.main.topic.Diary;
 import com.ynu.diary.main.topic.ITopic;
 import com.ynu.diary.main.topic.Memo;
 import com.ynu.diary.oobe.CustomViewTarget;
+import com.ynu.diary.setting.SettingActivity;
 import com.ynu.diary.shared.FileManager;
 import com.ynu.diary.shared.SPFManager;
 import com.ynu.diary.shared.ThemeManager;
@@ -461,8 +463,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 yourNameDialogFragment.show(getSupportFragmentManager(), "yourNameDialogFragment");
                 break;
             case R.id.IV_main_setting:
-                MainSettingDialogFragment mainSettingDialogFragment = new MainSettingDialogFragment();
-                mainSettingDialogFragment.show(getSupportFragmentManager(), "mainSettingDialogFragment");
+                Intent settingPageIntent = new Intent(this, SettingActivity.class);
+                this.startActivity(settingPageIntent);
                 break;
             case R.id.IV_main_setting_add_topic:
                 TopicDetailDialogFragment createTopicDialogFragment =
