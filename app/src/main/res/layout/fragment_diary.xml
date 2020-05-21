@@ -29,6 +29,14 @@
             android:src="@drawable/ic_location_off_white_24dp" />
 
         <ImageView
+            android:id="@+id/IV_diary_voice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:clickable="false"
+            android:src="@drawable/ic_sound_recording" />
+
+        <ImageView
             android:id="@+id/IV_diary_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

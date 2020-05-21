@@ -101,7 +101,7 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
 
     private Spinner SP_diary_weather, SP_diary_mood;
     private EditText EDT_diary_title;
-    private ImageView IV_diary_menu, IV_diary_location, IV_diary_photo, IV_diary_delete, IV_diary_clear, IV_diary_save;
+    private ImageView IV_diary_menu, IV_diary_location, IV_diary_voice, IV_diary_photo, IV_diary_delete, IV_diary_clear, IV_diary_save;
     private TextView TV_diary_item_content_hint;
 
 
@@ -189,6 +189,8 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
         LL_diary_item_content.setOnClickListener(this);
 
         IV_diary_menu = (ImageView) rootView.findViewById(R.id.IV_diary_menu);
+        IV_diary_voice = (ImageView) rootView.findViewById(R.id.IV_diary_voice);
+        IV_diary_voice.setOnClickListener(this);
         IV_diary_location = (ImageView) rootView.findViewById(R.id.IV_diary_location);
         IV_diary_location.setOnClickListener(this);
         IV_diary_photo = (ImageView) rootView.findViewById(R.id.IV_diary_photo);
@@ -726,6 +728,10 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
                 LL_diary_item_content.removeViewAt(position);
                 diaryItemHelper.mergerAdjacentText(position);
                 diaryItemHelper.resortPosition();
+                break;
+            case R.id.IV_diary_voice:
+                SoundRecordingDialogFragment soundRecordingDialogFragment = new SoundRecordingDialogFragment();
+                soundRecordingDialogFragment.show(getFragmentManager(), "soundRecordingDialogFragment");
                 break;
             case R.id.IV_diary_location:
                 if (isLocation) {
