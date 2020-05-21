@@ -70,5 +70,7 @@
     <!--OOBE-->
     <color name="OOBE_bg_color">#e570A3B4</color>
 
+    <!--搜索框-->
+    <color name="light_gray">#EFEFEF</color>
 
 </resources>

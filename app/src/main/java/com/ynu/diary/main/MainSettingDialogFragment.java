@@ -2,7 +2,6 @@ package com.ynu.diary.main;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -32,7 +31,7 @@ public class MainSettingDialogFragment extends BottomSheetDialogFragment impleme
      */
 
     private RelativeLayout RL_main_setting_dialog;
-    private ImageView IV_main_setting_setting_page, IV_main_setting_add_topic,
+    private ImageView IV_main_setting_setting_page,
             IV_main_setting_setting_security, IV_main_setting_backup, IV_main_setting_about;
 
     @Override
@@ -52,8 +51,7 @@ public class MainSettingDialogFragment extends BottomSheetDialogFragment impleme
         RL_main_setting_dialog.setBackgroundColor(ThemeManager.getInstance().getThemeMainColor(getActivity()));
         IV_main_setting_setting_page = (ImageView) rootView.findViewById(R.id.IV_main_setting_setting_page);
         IV_main_setting_setting_page.setOnClickListener(this);
-        IV_main_setting_add_topic = (ImageView) rootView.findViewById(R.id.IV_main_setting_add_topic);
-        IV_main_setting_add_topic.setOnClickListener(this);
+
         IV_main_setting_setting_security = (ImageView) rootView.findViewById(R.id.IV_main_setting_setting_security);
         IV_main_setting_setting_security.setOnClickListener(this);
         IV_main_setting_backup = (ImageView) rootView.findViewById(R.id.IV_main_setting_backup);
@@ -74,12 +72,6 @@ public class MainSettingDialogFragment extends BottomSheetDialogFragment impleme
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.IV_main_setting_add_topic:
-                TopicDetailDialogFragment createTopicDialogFragment =
-                        TopicDetailDialogFragment.newInstance(false, -1, -1, "", -1, Color.BLACK);
-                createTopicDialogFragment.show(getFragmentManager(), "createTopicDialogFragment");
-                dismiss();
-                break;
             case R.id.IV_main_setting_setting_page:
                 Intent settingPageIntent = new Intent(getActivity(), SettingActivity.class);
                 getActivity().startActivity(settingPageIntent);

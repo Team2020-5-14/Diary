@@ -1,6 +1,7 @@
 package com.ynu.diary.main;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -92,10 +93,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ThemeManager themeManager;
     private ImageView IV_main_profile_picture;
 
+
     private LinearLayout LL_main_profile;
+    private RelativeLayout RL_main_bottom_bar;
     private TextView TV_main_profile_username;
     private EditText EDT_main_topic_search;
     private ImageView IV_main_setting;
+    private ImageView IV_main_setting_add_topic;
 
 
     @Override
@@ -109,16 +113,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         themeManager = ThemeManager.getInstance();
 
         LL_main_profile = (LinearLayout) findViewById(R.id.LL_main_profile);
-        LL_main_profile.setOnClickListener(this);
-
+        RL_main_bottom_bar = (RelativeLayout) findViewById(R.id.RL_main_bottom_bar);
         IV_main_profile_picture = (ImageView) findViewById(R.id.IV_main_profile_picture);
+        IV_main_profile_picture.setOnClickListener(this);
+
         TV_main_profile_username = (TextView) findViewById(R.id.TV_main_profile_username);
+        TV_main_profile_username.setOnClickListener(this);
 
         EDT_main_topic_search = (EditText) findViewById(R.id.EDT_main_topic_search);
         EDT_main_topic_search.addTextChangedListener(this);
 
         IV_main_setting = (ImageView) findViewById(R.id.IV_main_setting);
         IV_main_setting.setOnClickListener(this);
+
+        IV_main_setting_add_topic = (ImageView) findViewById(R.id.IV_main_setting_add_topic);
+        IV_main_setting_add_topic.setOnClickListener(this);
 
         RecyclerView_topic = (RecyclerView) findViewById(R.id.RecyclerView_topic);
 
@@ -136,12 +145,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dbManager.closeDB();
         mainTopicAdapter.notifyDataSetChanged(true);
 
-        initOOBE();
-        //Check show Release note dialog.
-        if (getIntent().getBooleanExtra("showReleaseNote", false)) {
-            ReleaseNoteDialogFragment releaseNoteDialogFragment = new ReleaseNoteDialogFragment();
-            releaseNoteDialogFragment.show(getSupportFragmentManager(), "releaseNoteDialogFragment");
-        }
+        /*
+         * 第一次使用的引导：initOOBE
+         *
+         * 关闭显示日志功能
+         * */
+//        initOOBE();
+//        //Check show Release note dialog.
+//        if (getIntent().getBooleanExtra("showReleaseNote", false)) {
+//            ReleaseNoteDialogFragment releaseNoteDialogFragment = new ReleaseNoteDialogFragment();
+//            releaseNoteDialogFragment.show(getSupportFragmentManager(), "releaseNoteDialogFragment");
+//        }
     }
 
     @Override
@@ -218,9 +232,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initBottomBar() {
-        EDT_main_topic_search.getBackground().setColorFilter(themeManager.getThemeMainColor(this),
-                PorterDuff.Mode.SRC_ATOP);
-        IV_main_setting.setColorFilter(themeManager.getThemeMainColor(this));
+//        EDT_main_topic_search.getBackground().setColorFilter(themeManager.getThemeMainColor(this),
+//                PorterDuff.Mode.SRC_ATOP);
+        RL_main_bottom_bar.getBackground().setColorFilter(themeManager.getThemeMainColor(this), PorterDuff.Mode.SRC_ATOP);
+        IV_main_setting.setColorFilter(Color.WHITE);
+        IV_main_setting_add_topic.setColorFilter(Color.WHITE);
+//        IV_main_setting.setColorFilter(themeManager.getThemeMainColor(this));
+//        IV_main_setting_add_topic.setColorFilter(themeManager.getThemeMainColor(this));
     }
 
     private void loadTopic() {
@@ -231,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case ITopic.TYPE_CONTACTS:
                     topicList.add(
                             new Contacts(topicCursor.getLong(0),
-                                    topicCursor.getString(1),topicCursor.getInt(5)));
+                                    topicCursor.getString(1), topicCursor.getInt(5)));
                     break;
                 case ITopic.TYPE_DIARY:
                     topicList.add(
@@ -437,13 +455,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.LL_main_profile:
+            case R.id.IV_main_profile_picture:
+            case R.id.TV_main_profile_username:
                 YourNameDialogFragment yourNameDialogFragment = new YourNameDialogFragment();
                 yourNameDialogFragment.show(getSupportFragmentManager(), "yourNameDialogFragment");
                 break;
             case R.id.IV_main_setting:
                 MainSettingDialogFragment mainSettingDialogFragment = new MainSettingDialogFragment();
                 mainSettingDialogFragment.show(getSupportFragmentManager(), "mainSettingDialogFragment");
+                break;
+            case R.id.IV_main_setting_add_topic:
+                TopicDetailDialogFragment createTopicDialogFragment =
+                        TopicDetailDialogFragment.newInstance(false, -1, -1, "", -1, Color.BLACK);
+                createTopicDialogFragment.show(getSupportFragmentManager(), "createTopicDialogFragment");
+//                dismiss();
                 break;
         }
     }
@@ -485,6 +510,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void setCount(long count) {
 
                     }
+
                     @Override
                     public long getCount() {
                         return 0;

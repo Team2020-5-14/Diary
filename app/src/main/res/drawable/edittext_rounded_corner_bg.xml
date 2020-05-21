@@ -4,12 +4,18 @@
 
     <!-- rounded corner -->
     <corners android:radius="10dp" />
+
+    <!-- 边框线 -->
+<!--    <stroke-->
+<!--        android:width="2dp"-->
+<!--        android:color="#000000" />-->
+
     <padding
         android:bottom="3dp"
         android:left="3dp"
         android:right="3dp"
         android:top="3dp" />
 
-    <solid android:color="@android:color/white" />
+    <solid android:color="@color/light_gray" />
 
 </shape>
