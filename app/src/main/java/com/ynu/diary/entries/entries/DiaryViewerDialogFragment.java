@@ -53,6 +53,7 @@ import com.ynu.diary.entries.diary.DiaryPhotoBottomSheet;
 import com.ynu.diary.entries.diary.ImageArrayAdapter;
 import com.ynu.diary.entries.diary.item.DiaryItemHelper;
 import com.ynu.diary.entries.diary.item.DiaryPhoto;
+import com.ynu.diary.entries.diary.item.DiarySound;
 import com.ynu.diary.entries.diary.item.DiaryText;
 import com.ynu.diary.entries.diary.item.DiaryTextTag;
 import com.ynu.diary.entries.diary.item.IDairyRow;
@@ -148,6 +149,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
      * Diary Photo viewer
      */
     private ArrayList<Uri> diaryPhotoFileList;
+    private ArrayList<Uri> diarySoundFileList;
 
     /**
      * Google Place API
@@ -284,6 +286,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
             } else {
                 diaryFileManager = new FileManager(getActivity(), ((DiaryActivity) getActivity()).getTopicId(), diaryId);
                 diaryPhotoFileList = new ArrayList<>();
+                diarySoundFileList = new ArrayList<>();
                 initData();
             }
         }
@@ -517,6 +520,22 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                     ((DiaryPhoto) diaryItem).setDraweeViewPositionTag(photoCount);
                     photoCount++;
                     diaryPhotoFileList.add(Uri.parse(content));
+                }
+            } else if (diaryContentCursor.getInt(1) == IDairyRow.TYPE_SOUND) {
+                diaryItem = new DiarySound(getActivity());
+                content = FileManager.FILE_HEADER +
+                        diaryFileManager.getDirAbsolutePath() + "/" + diaryContentCursor.getString(3);
+                if (isEditMode) {
+                    diaryItem.setEditMode(true);
+                    ((DiarySound) diaryItem).setDeleteClickListener(this);
+                    //For get the right file name
+                    ((DiarySound) diaryItem).setSoundFileName(diaryContentCursor.getString(3));
+                } else {
+                    diaryItem.setEditMode(false);
+//                    ((DiarySound) diaryItem).setDraweeViewPositionTag(photoCount);
+//                    photoCount++;
+//                    diaryPhotoFileList.add(Uri.parse(content));
+//                    diarySoundFileList.add(Uri.parse(content));
                 }
             } else if (diaryContentCursor.getInt(1) == IDairyRow.TYPE_TEXT) {
                 diaryItem = new DiaryText(getActivity());
@@ -828,6 +847,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                 }
                 break;
             case R.id.IV_diary_photo_delete:
+            case R.id.IV_diary_sound_delete:
                 int deletePosition = (int) v.getTag();
                 Log.e("test", "deletePosition = " + deletePosition);
                 diaryItemHelper.remove(deletePosition);

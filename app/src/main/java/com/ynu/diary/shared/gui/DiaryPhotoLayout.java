@@ -41,7 +41,7 @@ public class DiaryPhotoLayout extends LinearLayout {
         IV_diary_photo_delete = (ImageView) v.findViewById(R.id.IV_diary_photo_delete);
     }
 
-    public void setPhotoUri( Uri photoUri) {
+    public void setPhotoUri(Uri photoUri) {
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(photoUri)
                 .setResizeOptions(new ResizeOptions(DiaryItemHelper.getVisibleWidth(getContext()),
                         DiaryItemHelper.getVisibleHeight(getContext())))

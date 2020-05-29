@@ -48,6 +48,7 @@ import com.ynu.diary.entries.BaseDiaryFragment;
 import com.ynu.diary.entries.DiaryActivity;
 import com.ynu.diary.entries.diary.item.DiaryItemHelper;
 import com.ynu.diary.entries.diary.item.DiaryPhoto;
+import com.ynu.diary.entries.diary.item.DiarySound;
 import com.ynu.diary.entries.diary.item.DiaryText;
 import com.ynu.diary.entries.diary.item.DiaryTextTag;
 import com.ynu.diary.entries.diary.item.IDairyRow;
@@ -492,6 +493,15 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
                 //For get the right file name
                 ((DiaryPhoto) diaryItem).setPhotoFileName(
                         autoSaveDiary.getDiaryItemList().get(i).getDiaryItemContent());
+            } else if (autoSaveDiary.getDiaryItemList().get(i).getDiaryItemType() == IDairyRow.TYPE_SOUND) {
+                diaryItem = new DiarySound(getActivity());
+                content = FileManager.FILE_HEADER +
+                        diaryTempFileManager.getDirAbsolutePath() + "/" +
+                        autoSaveDiary.getDiaryItemList().get(i).getDiaryItemContent();
+                ((DiarySound) diaryItem).setDeleteClickListener(this);
+                //For get the right file name
+                ((DiarySound) diaryItem).setSoundFileName(
+                        autoSaveDiary.getDiaryItemList().get(i).getDiaryItemContent());
             } else if (autoSaveDiary.getDiaryItemList().get(i).getDiaryItemType() == IDairyRow.TYPE_TEXT) {
                 diaryItem = new DiaryText(getActivity());
                 content = autoSaveDiary.getDiaryItemList().get(i).getDiaryItemContent();
@@ -724,6 +734,7 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
                 }
                 break;
             case R.id.IV_diary_photo_delete:
+            case R.id.IV_diary_sound_delete:
                 int position = (int) v.getTag();
                 diaryItemHelper.remove(position);
                 LL_diary_item_content.removeViewAt(position);
@@ -802,6 +813,44 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
 
     private void loadSoundRecordingFromTemp(String fileName) {
         //todo 录音文件已经能够保存在工作文件夹的Temp文件夹下了，接下来需要load语音到Diary，以及完成后续操作
+        try {
+            String tempFileSrc = FileManager.FILE_HEADER + diaryTempFileManager.getDirAbsolutePath() + "/" + fileName;
+            DiarySound diarySound = new DiarySound(getActivity());
+            diarySound.setSound(Uri.parse(tempFileSrc), fileName);
+
+            DiaryTextTag tag = checkoutOldDiaryContent();
+            //Check edittext is focused
+            if (tag != null) {
+                //Add new edittext
+                DiaryText diaryText = new DiaryText(getActivity());
+                diaryText.setPosition(tag.getPositionTag());
+                diaryText.setContent(tag.getNextEditTextStr());
+                diaryItemHelper.createItem(diaryText, tag.getPositionTag() + 1);
+                diaryText.getView().requestFocus();
+                //Add photo
+                diarySound.setPosition(tag.getPositionTag() + 1);
+                diarySound.setDeleteClickListener(this);
+                diaryItemHelper.createItem(diarySound, tag.getPositionTag() + 1);
+            } else {
+                //Add photo
+                diarySound.setPosition(diaryItemHelper.getItemSize());
+                diarySound.setDeleteClickListener(this);
+                diaryItemHelper.createItem(diarySound);
+                //Add new edittext
+                DiaryText diaryText = new DiaryText(getActivity());
+                diaryText.setPosition(diaryItemHelper.getItemSize());
+                diaryItemHelper.createItem(diaryText);
+                diaryText.getView().requestFocus();
+            }
+//            } else {
+//                throw new FileNotFoundException(tempFileSrc + "not found or bitmap is null");
+//            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            Toast.makeText(getActivity(), getString(R.string.toast_photo_path_error), Toast.LENGTH_LONG).show();
+        } finally {
+            diaryItemHelper.resortPosition();
+        }
     }
 
     private static class DiaryHandler extends Handler {

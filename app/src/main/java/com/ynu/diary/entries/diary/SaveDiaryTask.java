@@ -87,7 +87,9 @@ public class SaveDiaryTask extends AsyncTask<Long, Void, Integer> {
                 for (int i = 0; i < diaryItemHelper.getItemSize(); i++) {
                     //Copy photo from temp to diary dir
                     if (diaryItemHelper.get(i).getType() == IDairyRow.TYPE_PHOTO) {
-                        savePhoto(diaryItemHelper.get(i).getContent());
+                        savePhotoAndSound(diaryItemHelper.get(i).getContent());
+                    } else if (diaryItemHelper.get(i).getType() == IDairyRow.TYPE_SOUND) {
+                        savePhotoAndSound(diaryItemHelper.get(i).getContent());
                     }
                     //Save data
                     dbManager.insertDiaryContent(diaryItemHelper.get(i).getType(), i
@@ -123,7 +125,7 @@ public class SaveDiaryTask extends AsyncTask<Long, Void, Integer> {
         callBack.onDiarySaved();
     }
 
-    private void savePhoto(String filename) throws Exception {
+    private void savePhotoAndSound(String filename) throws Exception {
         FileManager.copy(new File(tempFileManager.getDirAbsolutePath() + "/" + filename),
                 new File(diaryFileManager.getDirAbsolutePath() + "/" + filename));
     }

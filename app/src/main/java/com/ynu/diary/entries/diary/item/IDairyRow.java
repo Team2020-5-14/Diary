@@ -11,6 +11,7 @@ public interface IDairyRow {
     int TYPE_TEXT = 0;
     int TYPE_PHOTO = 1;
     int TYPE_WEB_BLOCK = 2;
+    int TYPE_SOUND = 3;
 
     void setContent(String content);
 
@@ -31,6 +32,7 @@ public interface IDairyRow {
 
     /**
      * get position for auto save
+     *
      * @return
      */
     int getPosition();
