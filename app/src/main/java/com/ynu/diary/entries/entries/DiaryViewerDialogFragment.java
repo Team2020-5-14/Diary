@@ -14,10 +14,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -48,9 +50,11 @@ import com.ynu.diary.db.DBManager;
 import com.ynu.diary.entries.DiaryActivity;
 import com.ynu.diary.entries.EditDiaryBackDialogFragment;
 import com.ynu.diary.entries.diary.CopyPhotoTask;
+import com.ynu.diary.entries.diary.CopySoundRecordingTask;
 import com.ynu.diary.entries.diary.DiaryInfoHelper;
 import com.ynu.diary.entries.diary.DiaryPhotoBottomSheet;
 import com.ynu.diary.entries.diary.ImageArrayAdapter;
+import com.ynu.diary.entries.diary.SoundRecordingDialogFragment;
 import com.ynu.diary.entries.diary.item.DiaryItemHelper;
 import com.ynu.diary.entries.diary.item.DiaryPhoto;
 import com.ynu.diary.entries.diary.item.DiarySound;
@@ -88,7 +92,16 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
         DiaryDeleteDialogFragment.DeleteCallback, CopyDiaryToEditCacheTask.EditTaskCallBack,
         DiaryPhotoBottomSheet.PhotoCallBack, CopyPhotoTask.CopyPhotoCallBack,
         UpdateDiaryTask.UpdateDiaryCallBack, EditDiaryBackDialogFragment.BackDialogCallback,
-        DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+        DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
+        SoundRecordingDialogFragment.soundRecordingCallBack, CopySoundRecordingTask.CopySoundRecordingCallBack {
+
+    private ImageView IV_diary_close_dialog, IV_diary_location, IV_diary_photo, IV_diary_voice,
+            IV_diary_delete, IV_diary_clear, IV_diary_save;
+
+    @Override
+    public void addSoundRecording(String filePath) {
+        // todo 这里需要重新过一遍添加语音的逻辑！！！
+    }
 
     /**
      * Callback
@@ -123,8 +136,12 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
     private EditText EDT_diary_title;
 
     private LinearLayout LL_diary_item_content;
-    private ImageView IV_diary_close_dialog, IV_diary_location, IV_diary_photo,
-            IV_diary_delete, IV_diary_clear, IV_diary_save;
+
+    @Override
+    public void onCopySoundRecordingCompiled(String fileName) {
+
+    }
+
     private boolean isEditMode;
 
     /**
@@ -213,7 +230,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
         return dialog;
     }
 
-
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -249,6 +266,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
         IV_diary_location = (ImageView) rootView.findViewById(R.id.IV_diary_location);
 
         IV_diary_photo = (ImageView) rootView.findViewById(R.id.IV_diary_photo);
+        IV_diary_voice = (ImageView) rootView.findViewById(R.id.IV_diary_voice);
         IV_diary_delete = (ImageView) rootView.findViewById(R.id.IV_diary_delete);
         IV_diary_clear = (ImageView) rootView.findViewById(R.id.IV_diary_clear);
         IV_diary_save = (ImageView) rootView.findViewById(R.id.IV_diary_save);
@@ -460,6 +478,9 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
 
             IV_diary_photo.setImageResource(R.drawable.ic_photo_camera_white_24dp);
             IV_diary_photo.setOnClickListener(this);
+            IV_diary_voice.setImageResource(R.drawable.ic_sound_recording);
+            IV_diary_voice.setOnClickListener(this);
+
         } else {
             EDT_diary_title.setVisibility(View.GONE);
             RL_diary_weather = (RelativeLayout) rootView.findViewById(R.id.RL_diary_weather);
@@ -862,6 +883,11 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                         PhotoDetailViewerActivity.DIARY_PHOTO_FILE_LIST, diaryPhotoFileList);
                 gotoPhotoDetailViewer.putExtra(PhotoDetailViewerActivity.SELECT_POSITION, draweeViewPosition);
                 getActivity().startActivity(gotoPhotoDetailViewer);
+                break;
+            case R.id.IV_diary_voice:
+                Log.i("日记展示页", "点击了编辑语音");
+                SoundRecordingDialogFragment soundRecordingDialogFragment = new SoundRecordingDialogFragment(this);
+                soundRecordingDialogFragment.show(getFragmentManager(), "soundRecordingDialogFragment");
                 break;
             case R.id.IV_diary_photo:
                 if (isEditMode) {

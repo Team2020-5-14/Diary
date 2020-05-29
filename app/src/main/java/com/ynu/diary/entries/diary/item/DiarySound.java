@@ -10,7 +10,7 @@ public class DiarySound implements IDairyRow {
     private DiarySoundLayout diarySoundLayout;
     private String soundFileName;
     private Uri soundUri;
-    // todo 语音不能播放 查看图片出现语音的图标
+    // todo 语音不能播放 查看图片出现多余的错误图标
     private int position;
 
     public DiarySound(Activity activity) {

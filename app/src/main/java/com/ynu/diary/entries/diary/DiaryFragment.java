@@ -87,7 +87,8 @@ import static com.ynu.diary.shared.PermissionHelper.REQUEST_CAMERA_AND_WRITE_ES_
 public class DiaryFragment extends BaseDiaryFragment implements View.OnClickListener,
         DiaryPhotoBottomSheet.PhotoCallBack, Observer, SaveDiaryTask.SaveDiaryCallBack,
         CopyPhotoTask.CopyPhotoCallBack, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
-        ClearDialogFragment.ClearDialogCallback, SoundRecordingDialogFragment.soundRecordingCallBack, CopySoundRecordingTask.CopySoundRecordingCallBack {
+        ClearDialogFragment.ClearDialogCallback, SoundRecordingDialogFragment.soundRecordingCallBack,
+        CopySoundRecordingTask.CopySoundRecordingCallBack {
 
 
     private String TAG = "DiaryFragment";

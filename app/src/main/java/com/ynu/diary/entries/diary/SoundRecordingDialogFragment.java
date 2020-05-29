@@ -31,6 +31,10 @@ import java.util.Locale;
 
 @SuppressLint("ValidFragment")
 public class SoundRecordingDialogFragment extends DialogFragment implements View.OnClickListener {
+    public SoundRecordingDialogFragment(soundRecordingCallBack callback) {
+        this.callBack = callback;
+    }
+
     // 录音文件存放目录
     final String audioSaveDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Diary/";
     private soundRecordingCallBack callBack;
@@ -39,8 +43,8 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
     private TextView text_time;
     private MyDiaryButton But_cancel, But_ok;
 
-    public SoundRecordingDialogFragment(DiaryFragment diaryFragment) {
-        this.callBack = diaryFragment;
+    public interface soundRecordingCallBack {
+        void addSoundRecording(String filePath);
     }
 
 
@@ -212,9 +216,6 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
         }
     }
 
-    public interface soundRecordingCallBack {
-        void addSoundRecording(String filePath);
-    }
 
     // 格式化 录音时长为 时:分:秒
     public static String FormatMiss(int miss) {
