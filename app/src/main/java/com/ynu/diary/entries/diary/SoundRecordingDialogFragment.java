@@ -29,11 +29,20 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
 
+@SuppressLint("ValidFragment")
 public class SoundRecordingDialogFragment extends DialogFragment implements View.OnClickListener {
+    // 录音文件存放目录
+    final String audioSaveDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Diary/";
+    private soundRecordingCallBack callBack;
     private LinearLayout LL_sound_recording;
     private Button btn_start, btn_stop;
     private TextView text_time;
     private MyDiaryButton But_cancel, But_ok;
+
+    public SoundRecordingDialogFragment(DiaryFragment diaryFragment) {
+        this.callBack = diaryFragment;
+    }
+
 
     // 录音功能相关
     MediaRecorder mMediaRecorder; // MediaRecorder 实例
@@ -43,19 +52,6 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
     Thread timeThread; // 记录录音时长的线程
     int timeCount; // 录音时长 计数
     final int TIME_COUNT = 0x101;
-
-    // 录音文件存放目录
-    final String audioSaveDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/audiodemo/";
-    // todo 可以录音了，但是只是保存在本地，还不能被日记本调用，所以后边要让录好的声音绑定在日记里面
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        // request a window without the title
-        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        return dialog;
-    }
 
     @Nullable
     @Override
@@ -72,9 +68,18 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
         But_ok.setOnClickListener(this);
         But_cancel = (MyDiaryButton) rootView.findViewById(R.id.But_cancel);
         But_cancel.setOnClickListener(this);
+//        callBack = soundRecordingCallBack;
         return rootView;
     }
 
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        // request a window without the title
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
+    }
 
     @Override
     public void onClick(View v) {
@@ -83,7 +88,8 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
                 // 开始录音
                 btn_start.setEnabled(false);
                 btn_stop.setEnabled(true);
-
+                But_ok.setEnabled(false);
+                But_cancel.setEnabled(false);
                 startRecord();
                 isRecording = true;
                 // 初始化录音时长记录
@@ -97,18 +103,49 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
                 break;
             case R.id.btn_stop:
                 // 停止录音
-                btn_start.setEnabled(true);
+                btn_start.setEnabled(false);
                 btn_stop.setEnabled(false);
+                But_ok.setEnabled(true);
+                But_cancel.setEnabled(true);
 
                 stopRecord();
                 isRecording = false;
                 break;
             case R.id.But_ok:
+                callBack.addSoundRecording(filePath);
                 dismiss();
                 break;
             case R.id.But_cancel:
+                File file = new File(filePath);
+                if (file.exists())
+                    file.delete();
                 dismiss();
                 break;
+        }
+    }
+
+    /**
+     * 停止录音
+     */
+    public void stopRecord() {
+        //有一些网友反应在5.0以上在调用stop的时候会报错，翻阅了一下谷歌文档发现上面确实写的有可能会报错的情况，捕获异常清理一下就行了，感谢大家反馈！
+        try {
+            mMediaRecorder.stop();
+            mMediaRecorder.release();
+            mMediaRecorder = null;
+//            filePath = "";
+
+        } catch (RuntimeException e) {
+            Log.i("Recording", e.toString());
+            mMediaRecorder.reset();
+            mMediaRecorder.release();
+            mMediaRecorder = null;
+
+            File file = new File(filePath);
+            if (file.exists())
+                file.delete();
+
+//            filePath = "";
         }
     }
 
@@ -175,29 +212,8 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
         }
     }
 
-    /**
-     * 停止录音
-     */
-    public void stopRecord() {
-        //有一些网友反应在5.0以上在调用stop的时候会报错，翻阅了一下谷歌文档发现上面确实写的有可能会报错的情况，捕获异常清理一下就行了，感谢大家反馈！
-        try {
-            mMediaRecorder.stop();
-            mMediaRecorder.release();
-            mMediaRecorder = null;
-            filePath = "";
-
-        } catch (RuntimeException e) {
-            Log.i("Recording", e.toString());
-            mMediaRecorder.reset();
-            mMediaRecorder.release();
-            mMediaRecorder = null;
-
-            File file = new File(filePath);
-            if (file.exists())
-                file.delete();
-
-            filePath = "";
-        }
+    public interface soundRecordingCallBack {
+        void addSoundRecording(String filePath);
     }
 
     // 格式化 录音时长为 时:分:秒

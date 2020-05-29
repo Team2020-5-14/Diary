@@ -8,9 +8,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.ynu.diary.R;
+import com.ynu.diary.shared.FileManager;
 import com.ynu.diary.shared.photo.BitmapHelper;
 import com.ynu.diary.shared.photo.ExifUtil;
-import com.ynu.diary.shared.FileManager;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,6 +42,7 @@ public class CopyPhotoTask extends AsyncTask<Void, Void, String> {
     public CopyPhotoTask(Context context, Uri uri,
                          int reqWidth, int reqHeight,
                          FileManager fileManager, CopyPhotoCallBack callBack) {
+        Log.i("CopyPhotoTask PhotoUri", String.valueOf(uri));
         this.uri = uri;
         isAddPicture = false;
         initTask(context, reqWidth, reqHeight, fileManager, callBack);
@@ -56,6 +57,7 @@ public class CopyPhotoTask extends AsyncTask<Void, Void, String> {
                          int reqWidth, int reqHeight,
                          FileManager fileManager, CopyPhotoCallBack callBack) {
         this.srcFileName = fileManager.getDirAbsolutePath() + "/" + srcFileName;
+        Log.i("CopyPhotoTask FileName", this.srcFileName);
         isAddPicture = true;
         initTask(context, reqWidth, reqHeight, fileManager, callBack);
     }
@@ -112,6 +114,8 @@ public class CopyPhotoTask extends AsyncTask<Void, Void, String> {
         FileOutputStream out = null;
         String fileName = FileManager.createRandomFileName();
         try {
+            Log.i("CopyPhotoTask radName", fileName);
+            Log.i("CopyPhotoTask AllName", fileManager.getDirAbsolutePath() + "/" + fileName);
             out = new FileOutputStream(fileManager.getDirAbsolutePath() + "/" + fileName);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
         } finally {

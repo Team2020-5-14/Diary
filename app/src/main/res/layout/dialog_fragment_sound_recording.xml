@@ -79,6 +79,7 @@
                 android:layout_toRightOf="@id/Space_sound_recording"
                 android:gravity="center"
                 android:text="@string/dialog_button_ok"
+                android:enabled="false"
                 android:textAllCaps="false" />
         </RelativeLayout>
     </LinearLayout>

@@ -86,7 +86,7 @@ import static com.ynu.diary.shared.PermissionHelper.REQUEST_CAMERA_AND_WRITE_ES_
 public class DiaryFragment extends BaseDiaryFragment implements View.OnClickListener,
         DiaryPhotoBottomSheet.PhotoCallBack, Observer, SaveDiaryTask.SaveDiaryCallBack,
         CopyPhotoTask.CopyPhotoCallBack, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
-        ClearDialogFragment.ClearDialogCallback {
+        ClearDialogFragment.ClearDialogCallback, SoundRecordingDialogFragment.soundRecordingCallBack, CopySoundRecordingTask.CopySoundRecordingCallBack {
 
 
     private String TAG = "DiaryFragment";
@@ -633,6 +633,7 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
     public void addPhoto(String fileName) {
         //1.get saved file for rotating & resize from temp
         //2.Then , Load bitmap in call back ;
+        Log.i("DiaryFragment PhotoName", fileName);
         new CopyPhotoTask(getActivity(), fileName,
                 DiaryItemHelper.getVisibleWidth(getActivity()), DiaryItemHelper.getVisibleHeight(getActivity()),
                 diaryTempFileManager, this).execute();
@@ -730,7 +731,7 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
                 diaryItemHelper.resortPosition();
                 break;
             case R.id.IV_diary_voice:
-                SoundRecordingDialogFragment soundRecordingDialogFragment = new SoundRecordingDialogFragment();
+                SoundRecordingDialogFragment soundRecordingDialogFragment = new SoundRecordingDialogFragment(this);
                 soundRecordingDialogFragment.show(getFragmentManager(), "soundRecordingDialogFragment");
                 break;
             case R.id.IV_diary_location:
@@ -781,6 +782,26 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
                 }
                 break;
         }
+    }
+
+    /**
+     * 录音完成的回调函数
+     *
+     * @param filePath 录音文件的地址
+     */
+    @Override
+    public void addSoundRecording(String filePath) {
+        new CopySoundRecordingTask(getActivity(), filePath,
+                diaryTempFileManager, this).execute();
+    }
+
+    @Override
+    public void onCopySoundRecordingCompiled(String fileName) {
+        loadSoundRecordingFromTemp(fileName);
+    }
+
+    private void loadSoundRecordingFromTemp(String fileName) {
+        //todo 录音文件已经能够保存在工作文件夹的Temp文件夹下了，接下来需要load语音到Diary，以及完成后续操作
     }
 
     private static class DiaryHandler extends Handler {
