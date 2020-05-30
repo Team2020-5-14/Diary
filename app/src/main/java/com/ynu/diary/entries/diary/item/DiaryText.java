@@ -33,7 +33,8 @@ public class DiaryText implements IDairyRow {
         int padding = ScreenHelper.dpToPixel(context.getResources(), 2);
         EDT_diary_text.setPadding(padding, padding, padding, padding);
     }
-    public void insertText(String text){
+
+    public void insertText(String text) {
         EDT_diary_text.getText().insert(EDT_diary_text.getText().length(), text);
 
     }

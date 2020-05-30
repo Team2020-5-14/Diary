@@ -13,6 +13,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -208,7 +210,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
      * Diary Photo viewer
      */
     private ArrayList<Uri> diaryPhotoFileList;
-    private ArrayList<Uri> diarySoundFileList;
+    private ArrayList<String> diarySoundFileList;
 
     /**
      * Google Place API
@@ -564,7 +566,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
     private void loadDiaryItemContent(DBManager dbManager) {
         Cursor diaryContentCursor = dbManager.selectDiaryContentByDiaryId(diaryId);
         //To count how many photo is in the diary on view mode.
-        int photoCount = 0;
+        int photoCount = 0, soundCount = 0;
         for (int i = 0; i < diaryContentCursor.getCount(); i++) {
             IDairyRow diaryItem = null;
             String content = "";
@@ -595,10 +597,11 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                     ((DiarySound) diaryItem).setSoundFileName(diaryContentCursor.getString(3));
                 } else {
                     diaryItem.setEditMode(false);
-//                    ((DiarySound) diaryItem).setDraweeViewPositionTag(photoCount);
-//                    photoCount++;
-//                    diaryPhotoFileList.add(Uri.parse(content));
-//                    diarySoundFileList.add(Uri.parse(content));
+                    ((DiarySound) diaryItem).setPlayBtnClickListener(this);
+                    ((DiarySound) diaryItem).setPlayBtnPositionTag(soundCount);
+//                    Log.i("loadItem Sound", String.valueOf(diaryItem.getPosition()));
+                    soundCount++;
+                    diarySoundFileList.add(content);
                 }
             } else if (diaryContentCursor.getInt(1) == IDairyRow.TYPE_TEXT) {
                 diaryItem = new DiaryText(getActivity());
@@ -918,6 +921,12 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                 diaryItemHelper.mergerAdjacentText(deletePosition);
                 diaryItemHelper.resortPosition();
                 break;
+            case R.id.IV_diary_sound_play:
+                int soundPosition = (int) v.getTag();
+//                Log.i("Click Sound", String.valueOf(soundPosition));
+                Log.i("播放语音 文件名", diarySoundFileList.get(soundPosition));
+                doPlay(null, diarySoundFileList.get(soundPosition));
+                break;
             case R.id.SDV_diary_new_photo:
                 int draweeViewPosition = (int) v.getTag();
                 Intent gotoPhotoDetailViewer = new Intent(getActivity(), PhotoDetailViewerActivity.class);
@@ -981,6 +990,38 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                     Toast.makeText(getActivity(), getString(R.string.toast_diary_empty), Toast.LENGTH_SHORT).show();
                 }
                 break;
+        }
+    }
+
+    private void doPlay(MediaPlayer mMediaPlayer, String filePath) {
+        if (mMediaPlayer == null) {
+            mMediaPlayer = new MediaPlayer();
+            final MediaPlayer finalMMediaPlayer = mMediaPlayer;
+            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    finalMMediaPlayer.reset();
+                    return false;
+                }
+            });
+        } else {
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer.reset();
+            mMediaPlayer = null;
+        }
+        try {
+            //详见“MediaPlayer”调用过程图
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            MediaPlayer.OnCompletionListener onCompletionListener = null;
+            mMediaPlayer.setOnCompletionListener(onCompletionListener);
+            mMediaPlayer.setDataSource(filePath);
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Log.e("语音error==", e.getMessage());
         }
     }
 

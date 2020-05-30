@@ -19,6 +19,14 @@ public class DiarySound implements IDairyRow {
         setEditMode(true);
     }
 
+    public void setPlayBtnClickListener(View.OnClickListener clickListener) {
+        diarySoundLayout.setPlayBtnOnClick(clickListener);
+    }
+
+    public void setPlayBtnPositionTag(int playBtnPositionTag) {
+        diarySoundLayout.setPlayBtnPositionTag(playBtnPositionTag);
+    }
+
     public void setDeleteClickListener(View.OnClickListener clickListener) {
         diarySoundLayout.setDeleteOnClick(clickListener);
     }
@@ -28,8 +36,8 @@ public class DiarySound implements IDairyRow {
         this.soundFileName = soundFileName;
     }
 
-    public void setSoundFileName(String photoFileName) {
-        this.soundFileName = photoFileName;
+    public void setSoundFileName(String soundFileName) {
+        this.soundFileName = soundFileName;
     }
 
     @Override
