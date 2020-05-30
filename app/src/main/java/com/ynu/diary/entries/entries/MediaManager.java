@@ -30,11 +30,8 @@ public class MediaManager {
 
     /**
      * 播放音频
-     *
-     * @param filePath
-     * @param onCompletionListenter
      */
-    public static void playSound(Context context, String filePath, MediaPlayer.OnCompletionListener onCompletionListenter) {
+    public static void playSound(Context context, String filePath, MediaPlayer.OnCompletionListener onCompletionListener) {
 
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
@@ -51,7 +48,7 @@ public class MediaManager {
         try {
             //详见“MediaPlayer”调用过程图
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mMediaPlayer.setOnCompletionListener(onCompletionListenter);
+            mMediaPlayer.setOnCompletionListener(onCompletionListener);
             mMediaPlayer.setDataSource(filePath);
             mMediaPlayer.prepare();
             mMediaPlayer.start();

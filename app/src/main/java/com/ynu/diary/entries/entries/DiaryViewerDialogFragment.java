@@ -210,7 +210,7 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
      */
     private ArrayList<Uri> diaryPhotoFileList;
     private ArrayList<String> diarySoundFileList;
-
+    private String playingFilePath = "";
     /**
      * Google Place API
      */
@@ -993,15 +993,38 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
 
     private void doPlay(String filePath) {
         if (MediaManager.isPlaying()) {
-            MediaManager.pause();
+            if (playingFilePath.equals(filePath)) {
+                MediaManager.pause();
+                Log.i("播放中：", "暂停");
+            } else {
+                MediaManager.release();
+                MediaManager.playSound(this.getActivity(), filePath, new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                    }
+                });
+                playingFilePath = filePath;
+            }
         } else if (MediaManager.isPause()) {
-            MediaManager.resume();
+            if (playingFilePath.equals(filePath)) {
+                MediaManager.resume();
+                Log.i("暂停中：", "继续");
+            } else {
+                MediaManager.release();
+                MediaManager.playSound(this.getActivity(), filePath, new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                    }
+                });
+                playingFilePath = filePath;
+            }
         } else {
             MediaManager.playSound(this.getActivity(), filePath, new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                 }
             });
+            playingFilePath = filePath;
         }
     }
 
