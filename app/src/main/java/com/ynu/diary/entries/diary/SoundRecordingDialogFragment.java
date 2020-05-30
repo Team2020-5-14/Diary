@@ -51,8 +51,8 @@ public class SoundRecordingDialogFragment extends DialogFragment implements View
     // 录音功能相关
     MediaRecorder mMediaRecorder; // MediaRecorder 实例
     boolean isRecording; // 录音状态
-    String fileName; // 录音文件的名称
-    String filePath; // 录音文件存储路径
+    String fileName = ""; // 录音文件的名称
+    String filePath = ""; // 录音文件存储路径
     Thread timeThread; // 记录录音时长的线程
     int timeCount; // 录音时长 计数
     final int TIME_COUNT = 0x101;
