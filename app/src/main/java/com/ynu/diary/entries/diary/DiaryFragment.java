@@ -813,7 +813,6 @@ public class DiaryFragment extends BaseDiaryFragment implements View.OnClickList
     }
 
     private void loadSoundRecordingFromTemp(String fileName) {
-        //todo 录音文件已经能够保存在工作文件夹的Temp文件夹下了，接下来需要load语音到Diary，以及完成后续操作
         try {
             String tempFileSrc = FileManager.FILE_HEADER + diaryTempFileManager.getDirAbsolutePath() + "/" + fileName;
             DiarySound diarySound = new DiarySound(getActivity());

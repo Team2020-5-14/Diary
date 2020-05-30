@@ -100,7 +100,8 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
 
     @Override
     public void addSoundRecording(String filePath) {
-        // todo 这里需要重新过一遍添加语音的逻辑！！！
+        new CopySoundRecordingTask(getActivity(), filePath,
+                diaryFileManager, this).execute();
     }
 
     /**
@@ -139,7 +140,48 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
 
     @Override
     public void onCopySoundRecordingCompiled(String fileName) {
+        loadSoundRecordingFromTemp(fileName);
+    }
 
+    private void loadSoundRecordingFromTemp(String fileName) {
+        try {
+            String tempFileSrc = FileManager.FILE_HEADER + diaryFileManager.getDirAbsolutePath() + "/" + fileName;
+            DiarySound diarySound = new DiarySound(getActivity());
+            diarySound.setSound(Uri.parse(tempFileSrc), fileName);
+
+            DiaryTextTag tag = checkoutOldDiaryContent();
+            //Check edittext is focused
+            if (tag != null) {
+                //Add new edittext
+                DiaryText diaryText = new DiaryText(getActivity());
+                diaryText.setPosition(tag.getPositionTag());
+                diaryText.setContent(tag.getNextEditTextStr());
+                diaryItemHelper.createItem(diaryText, tag.getPositionTag() + 1);
+                diaryText.getView().requestFocus();
+                //Add photo
+                diarySound.setPosition(tag.getPositionTag() + 1);
+                diarySound.setDeleteClickListener(this);
+                diaryItemHelper.createItem(diarySound, tag.getPositionTag() + 1);
+            } else {
+                //Add photo
+                diarySound.setPosition(diaryItemHelper.getItemSize());
+                diarySound.setDeleteClickListener(this);
+                diaryItemHelper.createItem(diarySound);
+                //Add new edittext
+                DiaryText diaryText = new DiaryText(getActivity());
+                diaryText.setPosition(diaryItemHelper.getItemSize());
+                diaryItemHelper.createItem(diaryText);
+                diaryText.getView().requestFocus();
+            }
+//            } else {
+//                throw new FileNotFoundException(tempFileSrc + "not found or bitmap is null");
+//            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            Toast.makeText(getActivity(), getString(R.string.toast_photo_path_error), Toast.LENGTH_LONG).show();
+        } finally {
+            diaryItemHelper.resortPosition();
+        }
     }
 
     private boolean isEditMode;
