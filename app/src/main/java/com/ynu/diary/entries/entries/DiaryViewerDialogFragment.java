@@ -13,7 +13,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -923,9 +922,8 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
                 break;
             case R.id.IV_diary_sound_play:
                 int soundPosition = (int) v.getTag();
-//                Log.i("Click Sound", String.valueOf(soundPosition));
                 Log.i("播放语音 文件名", diarySoundFileList.get(soundPosition));
-                doPlay(null, diarySoundFileList.get(soundPosition));
+                doPlay(diarySoundFileList.get(soundPosition));
                 break;
             case R.id.SDV_diary_new_photo:
                 int draweeViewPosition = (int) v.getTag();
@@ -993,35 +991,17 @@ public class DiaryViewerDialogFragment extends DialogFragment implements View.On
         }
     }
 
-    private void doPlay(MediaPlayer mMediaPlayer, String filePath) {
-        if (mMediaPlayer == null) {
-            mMediaPlayer = new MediaPlayer();
-            final MediaPlayer finalMMediaPlayer = mMediaPlayer;
-            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+    private void doPlay(String filePath) {
+        if (MediaManager.isPlaying()) {
+            MediaManager.pause();
+        } else if (MediaManager.isPause()) {
+            MediaManager.resume();
+        } else {
+            MediaManager.playSound(this.getActivity(), filePath, new MediaPlayer.OnCompletionListener() {
                 @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    finalMMediaPlayer.reset();
-                    return false;
+                public void onCompletion(MediaPlayer mediaPlayer) {
                 }
             });
-        } else {
-            mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer.reset();
-            mMediaPlayer = null;
-        }
-        try {
-            //详见“MediaPlayer”调用过程图
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            MediaPlayer.OnCompletionListener onCompletionListener = null;
-            mMediaPlayer.setOnCompletionListener(onCompletionListener);
-            mMediaPlayer.setDataSource(filePath);
-            mMediaPlayer.prepare();
-            mMediaPlayer.start();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Log.e("语音error==", e.getMessage());
         }
     }
 

@@ -15,15 +15,18 @@
             android:id="@+id/IV_diary_sound_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ic_sound" />
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="18dp"
+            android:background="@drawable/ic_sound"
+            android:scaleType="centerCrop" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:padding="10dp"
-            android:text="语音" />
+            android:text="点击播放/暂停"
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/IV_diary_sound_delete"
@@ -31,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:adjustViewBounds="true"
+
             android:background="@color/diary_photo_layout_delete_bg"
             android:src="@drawable/ic_delete_white_36dp" />
     </LinearLayout>
