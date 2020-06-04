@@ -112,9 +112,8 @@ public class CopyPhotoTask extends AsyncTask<Void, Void, String> {
     private String savePhotoToTemp(Bitmap bitmap) throws Exception {
 
         FileOutputStream out = null;
-        String fileName = FileManager.createRandomFileName();
+        String fileName = "/photo_" + FileManager.createRandomFileName();
         try {
-            Log.i("CopyPhotoTask radName", fileName);
             Log.i("CopyPhotoTask AllName", fileManager.getDirAbsolutePath() + "/" + fileName);
             out = new FileOutputStream(fileManager.getDirAbsolutePath() + "/" + fileName);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance

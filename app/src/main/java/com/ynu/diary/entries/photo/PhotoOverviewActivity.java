@@ -93,7 +93,9 @@ public class PhotoOverviewActivity extends AppCompatActivity {
             if (file.isDirectory()) {
                 inFiles.addAll(getFilesList(file));
             } else {
-                inFiles.add(file);
+                if (file.getName().split("_")[0].equals("photo")) {
+                    inFiles.add(file);
+                }
             }
         }
         return inFiles;
