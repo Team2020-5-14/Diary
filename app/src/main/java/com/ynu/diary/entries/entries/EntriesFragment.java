@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ynu.diary.R;
+import com.ynu.diary.album.WelcomeActivity;
 import com.ynu.diary.entries.BaseDiaryFragment;
 import com.ynu.diary.entries.DiaryActivity;
 import com.ynu.diary.entries.photo.PhotoOverviewActivity;
@@ -88,7 +89,7 @@ public class EntriesFragment extends BaseDiaryFragment implements
     private void countEntries() {
         TV_entries_count.setText(
                 getResources().getQuantityString(R.plurals.entries_count,
-                        getEntriesList().size(),getEntriesList().size()));
+                        getEntriesList().size(), getEntriesList().size()));
     }
 
     public void setEditModeUI(boolean isEditMode) {
@@ -133,7 +134,11 @@ public class EntriesFragment extends BaseDiaryFragment implements
             case R.id.IV_entries_photo:
                 Intent gotoPhotoOverviewIntent = new Intent(getActivity(), PhotoOverviewActivity.class);
                 gotoPhotoOverviewIntent.putExtra(PhotoOverviewActivity.PHOTO_OVERVIEW_TOPIC_ID, getTopicId());
-                getActivity().startActivity(gotoPhotoOverviewIntent);
+//                getActivity().startActivity(gotoPhotoOverviewIntent);
+//                break;
+                Intent gotoPhotoSelectIntent = new Intent(getActivity(), WelcomeActivity.class);
+                gotoPhotoSelectIntent.putExtra(WelcomeActivity.PHOTO_OVERVIEW_TOPIC_ID, getTopicId());
+                getActivity().startActivity(gotoPhotoSelectIntent);
                 break;
 
         }
