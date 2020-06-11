@@ -17,7 +17,6 @@ import com.ynu.diary.R;
 import com.ynu.diary.album.WelcomeActivity;
 import com.ynu.diary.entries.BaseDiaryFragment;
 import com.ynu.diary.entries.DiaryActivity;
-import com.ynu.diary.entries.photo.PhotoOverviewActivity;
 import com.ynu.diary.shared.ThemeManager;
 import com.ynu.diary.shared.ViewTools;
 
@@ -132,8 +131,8 @@ public class EntriesFragment extends BaseDiaryFragment implements
                 setEditModeUI(entriesAdapter.isEditMode());
                 break;
             case R.id.IV_entries_photo:
-                Intent gotoPhotoOverviewIntent = new Intent(getActivity(), PhotoOverviewActivity.class);
-                gotoPhotoOverviewIntent.putExtra(PhotoOverviewActivity.PHOTO_OVERVIEW_TOPIC_ID, getTopicId());
+//                Intent gotoPhotoOverviewIntent = new Intent(getActivity(), PhotoOverviewActivity.class);
+//                gotoPhotoOverviewIntent.putExtra(PhotoOverviewActivity.PHOTO_OVERVIEW_TOPIC_ID, getTopicId());
 //                getActivity().startActivity(gotoPhotoOverviewIntent);
 //                break;
                 Intent gotoPhotoSelectIntent = new Intent(getActivity(), WelcomeActivity.class);

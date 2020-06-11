@@ -53,6 +53,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
     public final static String PHOTO_OVERVIEW_TOPIC_ID = "PHOTOOVERVIEW_TOPIC_ID";
     public final static String PHOTO_OVERVIEW_DIARY_ID = "PHOTOOVERVIEW_DIARY_ID";
+
+    private long topicId;
+    private long diaryId;
     // for permission
     private static final int PERMISSION_REQUEST_STORAGE = 200;
     private final String[] actions = {
@@ -119,6 +122,20 @@ public class WelcomeActivity extends AppCompatActivity {
         pbar.setVisibility(pbar.GONE);
         setAppName();
 
+        //get topic id
+        topicId = getIntent().getLongExtra(PHOTO_OVERVIEW_TOPIC_ID, -1);
+        //get topic fail , close this activity
+        if (topicId == -1) {
+            Toast.makeText(this, getString(R.string.photo_viewer_topic_fail)
+                    , Toast.LENGTH_LONG).show();
+            finish();
+        }
+        diaryId = getIntent().getLongExtra(PHOTO_OVERVIEW_DIARY_ID, -1);
+        Log.d("Wel:topicID", String.valueOf(topicId));
+        Log.d("Wel:diaryId", String.valueOf(diaryId));
+        //Load the data
+        loadDiaryImageData(topicId, diaryId);
+
         if (Build.VERSION.SDK_INT >= 23) {
             // check permission
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -137,18 +154,6 @@ public class WelcomeActivity extends AppCompatActivity {
         } else {
             prepareForApplication();
         }
-
-        //get topic id
-        long topicId = getIntent().getLongExtra(PHOTO_OVERVIEW_TOPIC_ID, -1);
-        //get topic fail , close this activity
-        if (topicId == -1) {
-            Toast.makeText(this, getString(R.string.photo_viewer_topic_fail)
-                    , Toast.LENGTH_LONG).show();
-            finish();
-        }
-        long diaryId = getIntent().getLongExtra(PHOTO_OVERVIEW_DIARY_ID, -1);
-        //Load the data
-        loadDiaryImageData(topicId, diaryId);
     }
 
     private void loadDiaryImageData(long topicId, long diaryId) {
@@ -156,8 +161,10 @@ public class WelcomeActivity extends AppCompatActivity {
         File topicRootFile;
         if (diaryId != -1) {
             topicRootFile = new File(diaryRoot.getDirAbsolutePath() + "/" + topicId + "/" + diaryId);
+            Log.d("Wel:topicRootFile", topicRootFile.getPath());
         } else {
             topicRootFile = new File(diaryRoot.getDirAbsolutePath() + "/" + topicId);
+            Log.d("Wel:topicRootFile", topicRootFile.getPath());
         }
         //Load all file form topic dir
         diaryPhotoFileList = new ArrayList<>();
@@ -261,6 +268,8 @@ public class WelcomeActivity extends AppCompatActivity {
         List<Map> findResult;
         // for every image in device
         for (String uri : diaryPhotoFileList) {
+            Log.d("photoUrl", uri);
+
 //        for (Map<String, String> imageInfo : imagesInDevice) {
 
 //            myHandler.sendEmptyMessage(0x1);
@@ -285,15 +294,24 @@ public class WelcomeActivity extends AppCompatActivity {
         for (Map<String, String> imageInfo : imagesInDB) {
             url = imageInfo.get("url");
             // test whether had been deleted
-            findResult = operator.search("AlbumPhotos", "url = '" + url + "'");
-            if (findResult.size() == 0) {
+            File file = new File(url);
+            if (!file.exists()) {
+                Log.d("FileExists?", "no");
                 // had been deleted, erase it in db
                 operator.erase("AlbumPhotos", "url = ?", new String[]{"'" + url + "'"});
                 operator.erase("TFInformation", "url = ?", new String[]{"'" + url + "'"});
-            } else {
-                // not be deleted, do nothing
             }
+//            findResult = operator.search("AlbumPhotos", "url = '" + url + "'");
+//            if (findResult.size() == 0) {
+//                // had been deleted, erase it in db
+//                operator.erase("AlbumPhotos", "url = ?", new String[]{"'" + url + "'"});
+//                operator.erase("TFInformation", "url = ?", new String[]{"'" + url + "'"});
+//            } else {
+//                // not be deleted, do nothing
+//            }
         }
+        List<Map> imagesInDB2 = operator.search("AlbumPhotos");
+
         // for every album in db
         String album_name;
         List<Map> typeInAlbum = operator.search("Album");
@@ -386,19 +404,23 @@ public class WelcomeActivity extends AppCompatActivity {
         textView.setText("尽情享受吧");
         //setAppName();
         final Intent it = new Intent(getApplication(), MainActivity.class); //你要转向的Activity
+//        it.putExtra(MainActivity.PHOTO_OVERVIEW_TOPIC_ID, topicId);
+//        startActivity(it);
+//        WelcomeActivity.this.finish();
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                it.putExtra(MainActivity.PHOTO_OVERVIEW_TOPIC_ID, topicId);
                 startActivity(it);
                 WelcomeActivity.this.finish();
             }
         };
-        timer.schedule(task, 1000 * 2);
+        timer.schedule(task, 500);
     }
 
     private void setAppName() {
-        textViewTitle.setText("New Feelings");
+        textViewTitle.setText("图片智能分类中");
         textViewTitle.setTextSize(32);
         textViewTitle.setTextColor(Color.rgb(140, 21, 119));
     }

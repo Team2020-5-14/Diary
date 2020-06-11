@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ynu.diary.R;
@@ -22,15 +23,18 @@ import com.ynu.diary.album.adapter.HorizontalScrollViewAdapter;
 import com.ynu.diary.album.view.MyHorizontalScrollView;
 import com.ynu.diary.album.view.MyHorizontalScrollView.CurrentImageChangeListener;
 import com.ynu.diary.album.view.MyHorizontalScrollView.OnItemClickListener;
+import com.ynu.diary.shared.FileManager;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static com.ynu.diary.album.utils.ImagesScaner.getAlbumPhotos;
-import static com.ynu.diary.album.utils.ImagesScaner.getMediaImageInfo;
+import static com.ynu.diary.shared.FileManager.DIARY_ROOT_DIR;
 
 /**
  * 查看照片细节的activity
@@ -42,6 +46,14 @@ import static com.ynu.diary.album.utils.ImagesScaner.getMediaImageInfo;
 // adapter && view
 
 public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnClickListener */ {
+
+    public final static String PHOTO_OVERVIEW_TOPIC_ID = "PHOTOOVERVIEW_TOPIC_ID";
+    public final static String PHOTO_OVERVIEW_DIARY_ID = "PHOTOOVERVIEW_DIARY_ID";
+
+    private long topicId;
+    private long diaryId;
+
+    private ArrayList<String> diaryPhotoFileList;
 
     // which image
     int position_now = -1;
@@ -99,6 +111,20 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fg_detail);
+
+        //get topic id
+        topicId = getIntent().getLongExtra(PHOTO_OVERVIEW_TOPIC_ID, -1);
+        //get topic fail , close this activity
+        if (topicId == -1) {
+            Toast.makeText(this, getString(R.string.photo_viewer_topic_fail)
+                    , Toast.LENGTH_LONG).show();
+            finish();
+        }
+        diaryId = getIntent().getLongExtra(PHOTO_OVERVIEW_DIARY_ID, -1);
+        Log.d("PDetail:topicID", String.valueOf(topicId));
+        Log.d("PDetail:diaryId", String.valueOf(diaryId));
+
+
 //        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setTitle("");
@@ -112,8 +138,23 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
         if (type != null)
             mDatas = getAlbumPhotos(this, this.type);
             // 下面设置下面缩略图上面大图。
-        else
-            mDatas = getMediaImageInfo(this.getBaseContext());
+        else {
+            //Load the data
+            List<Map> result = new ArrayList<>();
+            loadDiaryImageData(topicId, diaryId);
+            Map<String, String> tmp;
+            for (String url : diaryPhotoFileList) {
+                tmp = new HashMap<>();
+//                tmp.put("album_name", "ALL");
+//                tmp.put("url", url);
+                tmp.put("_data", url);
+                result.add(tmp);
+            }
+            mDatas = result;
+        }
+        //Load the data
+//            loadDiaryImageData(topicId, diaryId);
+//        mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
 //        mAttacher = new PhotoViewAttacher(mImg);
         Glide.with(PhotoDetailActivity.this).load((String) mDatas.get(position_now).get("_data")).into(mImg);
@@ -153,6 +194,38 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
         });
         //设置适配器
         mHorizontalScrollView.initDatas(mAdapter, position_now);
+    }
+
+    private void loadDiaryImageData(long topicId, long diaryId) {
+        FileManager diaryRoot = new FileManager(PhotoDetailActivity.this, DIARY_ROOT_DIR);
+        File topicRootFile;
+        if (diaryId != -1) {
+            topicRootFile = new File(diaryRoot.getDirAbsolutePath() + "/" + topicId + "/" + diaryId);
+            Log.d("Wel:topicRootFile", topicRootFile.getPath());
+        } else {
+            topicRootFile = new File(diaryRoot.getDirAbsolutePath() + "/" + topicId);
+            Log.d("Wel:topicRootFile", topicRootFile.getPath());
+        }
+        //Load all file form topic dir
+        diaryPhotoFileList = new ArrayList<>();
+        for (File photoFile : getFilesList(topicRootFile)) {
+            diaryPhotoFileList.add(photoFile.getPath());
+        }
+    }
+
+    private List<File> getFilesList(File parentDir) {
+        ArrayList<File> inFiles = new ArrayList<>();
+        File[] files = parentDir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inFiles.addAll(getFilesList(file));
+            } else {
+                if (file.getName().split("_")[0].equals("photo")) {
+                    inFiles.add(file);
+                }
+            }
+        }
+        return inFiles;
     }
 
     private void initPhoto() {

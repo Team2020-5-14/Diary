@@ -62,7 +62,11 @@ import static com.ynu.diary.album.utils.ImageDealer.insertImageIntoDB;
  * created by dongchangzhang
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    public final static String PHOTO_OVERVIEW_TOPIC_ID = "PHOTOOVERVIEW_TOPIC_ID";
+    public final static String PHOTO_OVERVIEW_DIARY_ID = "PHOTOOVERVIEW_DIARY_ID";
 
+    private long topicId;
+    private long diaryId;
     private static final int PERMISSION_REQUEST_CAMERA = 300;
     //UI Object
     private TextView txt_photos;
@@ -110,6 +114,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //get topic id
+        topicId = getIntent().getLongExtra(PHOTO_OVERVIEW_TOPIC_ID, -1);
+        //get topic fail , close this activity
+        if (topicId == -1) {
+            Toast.makeText(this, getString(R.string.photo_viewer_topic_fail)
+                    , Toast.LENGTH_LONG).show();
+            finish();
+        }
+        diaryId = getIntent().getLongExtra(PHOTO_OVERVIEW_DIARY_ID, -1);
+        Log.d("MAIN:topicID", String.valueOf(topicId));
+        Log.d("MAIN:diaryId", String.valueOf(diaryId));
 
         setContentView(R.layout.activity_main_n);
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -526,7 +541,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // 可以使用其他方法，这个方法不好，下面相同
                 getFragmentManager().popBackStack();
                 if (photos == null) {
-                    photos = new Photos();
+                    photos = new Photos(topicId);
                     fTransaction.add(R.id.ly_content, photos);
                 } else {
                     fTransaction.show(photos);
