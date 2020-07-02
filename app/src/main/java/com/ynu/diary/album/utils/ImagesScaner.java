@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -199,17 +198,17 @@ public class ImagesScaner {
 
     // update db: add a new image
     //filename是我们的文件全名，包括后缀哦
-    public static void updateGallery(Context con, String filename) {
-        MediaScannerConnection.scanFile(con,
-                new String[]{filename}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri) {
-                        Log.i("ExternalStorage", "Scanned " + path + ":");
-                        Log.i("ExternalStorage", "-> uri=" + uri);
-                        Config.workdone = true;
-                    }
-                });
-    }
+//    public static void updateGallery(Context con, String filename) {
+//        MediaScannerConnection.scanFile(con,
+//                new String[]{filename}, null,
+//                new MediaScannerConnection.OnScanCompletedListener() {
+//                    public void onScanCompleted(String path, Uri uri) {
+//                        Log.i("ExternalStorage", "Scanned " + path + ":");
+//                        Log.i("ExternalStorage", "-> uri=" + uri);
+//                        Config.workdone = true;
+//                    }
+//                });
+//    }
 
     // get thumbnail image of fileName
     public static Bitmap getBitmap(Context ctx, String fileName) {

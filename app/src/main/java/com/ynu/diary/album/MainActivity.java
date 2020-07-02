@@ -1,33 +1,19 @@
 package com.ynu.diary.album;
 
-import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.content.ClipData;
-import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -36,21 +22,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ynu.diary.R;
-import com.ynu.diary.album.dao.MyDatabaseHelper;
 import com.ynu.diary.album.dao.MyDatabaseOperator;
 import com.ynu.diary.shared.ThemeManager;
 import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
 
-import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 import static com.ynu.diary.album.utils.ImageDealer.do_tensorflow;
 import static com.ynu.diary.album.utils.ImageDealer.insertImageIntoDB;
@@ -64,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private long topicId;
     private long diaryId;
-    private static final int PERMISSION_REQUEST_CAMERA = 300;
     //UI Object
     private TextView txt_photos;
     private TextView txt_albums;
@@ -72,20 +49,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Photos photos;
     private Albums albums;
     private FragmentManager fManager;
-    private List<Classifier.Recognition> results;
-    // for camera to save image
-    private Uri contentUri;
-    private File newFile;
 
     // notification
     private int NOTI_CODE_HAVE_NEW = 1;
     private int NOTI_CODE_CLASSIFYING = 2;
     private int NOTI_CODE_FINISHED = 3;
-    private int NOTI_CODE_NEW_PHOTO = 4;
     private NotificationManager manager;
 
     private TensorFlowImageClassifier classifier;
-    private ThemeManager themeManager;
 
     // topbar
     private ImageView iv_main_back;
@@ -134,11 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         iv_main_back.setColorFilter(ThemeManager.getInstance().getThemeDarkColor(this));
         //For set status bar
         ChinaPhoneHelper.setStatusBar(this, true);
-        themeManager = ThemeManager.getInstance();
 
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//        actionBar = getSupportActionBar();
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         // fragment
         fManager = getFragmentManager();
         bindViews();
@@ -244,204 +212,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**
-     * do it after require permission
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        doNext(requestCode, grantResults);
-    }
-
-    /**
-     * if have permission will do this, or show a toast
-     *
-     * @param requestCode
-     * @param grantResults
-     */
-    private void doNext(int requestCode, int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST_CAMERA) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCamera();
-            } else {
-                Toast.makeText(MainActivity.this,
-                        "对不起，我需要相机的权限！",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    /**
-     * 打开相机获取图片
-     */
-    private void startCamera() {
-        File imagePath = new File(Environment.getExternalStorageDirectory(), "tmp");
-        if (!imagePath.exists()) imagePath.mkdirs();
-        newFile = new File(imagePath, "default_image.jpg");
-        //第二参数是在manifest.xml定义 provider的authorities属性
-        contentUri = FileProvider.getUriForFile(this, "com.ynu.diary.album.fileprovider", newFile);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //兼容版本处理，因为 intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION) 只在5.0以上的版本有效
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            ClipData clip = ClipData.newUri(getContentResolver(), "A photo", contentUri);
-            intent.setClipData(clip);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        } else {
-            List<ResolveInfo> resInfoList =
-                    getPackageManager()
-                            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                grantUriPermission(packageName, contentUri,
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            }
-        }
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
-        startActivityForResult(intent, 1);
-    }
-
-    // 接受拍照的结果
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            ContentResolver contentProvider = getContentResolver();
-            ParcelFileDescriptor mInputPFD;
-            try {
-                //获取contentProvider图片
-                mInputPFD = contentProvider.openFileDescriptor(contentUri, "r");
-                final FileDescriptor fileDescriptor = mInputPFD.getFileDescriptor();
-
-                // new thread to deal image by tensorflow
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dealPics(fileDescriptor);
-                    }
-                }).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // deal image by tensorflow
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void dealPics(FileDescriptor fileDescriptor) {
-        Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-        // init tensorflow
-        if (classifier == null) {
-            // get permission
-            classifier = new TensorFlowImageClassifier();
-            try {
-                classifier.initializeTensorFlow(
-                        getAssets(), Config.MODEL_FILE, Config.LABEL_FILE,
-                        Config.NUM_CLASSES, Config.INPUT_SIZE, Config.IMAGE_MEAN,
-                        Config.IMAGE_STD, Config.INPUT_NAME, Config.OUTPUT_NAME);
-            } catch (final IOException e) {
-
-            }
-        }
-        // resize bitmap
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        float scaleWidth = ((float) Config.INPUT_SIZE) / width;
-        float scaleHeight = ((float) Config.INPUT_SIZE) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap newbm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-        // get classifier information
-        results = classifier.recognizeImage(newbm);
-        for (final Classifier.Recognition result : results) {
-            System.out.println("Result: " + result.getTitle());
-        }
-        // call function to save image
-        String url = saveImage("", bitmap);
-        Log.d("Detected = ", String.valueOf(results));
-        // update db
-        Config.dbHelper = new MyDatabaseHelper(this, "Album.db", null, Config.dbversion);
-        SQLiteDatabase db = Config.dbHelper.getWritableDatabase();
-        ContentValues values_ablum = new ContentValues();
-        ContentValues values = new ContentValues();
-        String album_type;
-        Cursor cursor_album = null;
-        for (Classifier.Recognition cr : results) {
-            int i;
-            for (i = 0; i < Config.tf_type_times; ++i) {
-                if (Config.tf_type_name[i].equals(cr.getTitle())) {
-                    break;
-                }
-            }
-            album_type = Config.album_type_name[i];
-            cursor_album = db.query("Album", null, "album_name ='" + album_type + "'", null, null, null, null);
-            if (!cursor_album.moveToFirst()) {
-                values_ablum.put("album_name", album_type);
-                values_ablum.put("show_image", url);
-                db.insert("Album", null, values_ablum);
-                values_ablum.clear();
-            }
-
-            values.put("album_name", album_type);
-            values.put("url", url);
-            db.insert("AlbumPhotos", null, values);
-            values.clear();
-        }
-        db.close();
-
-        sendMessages("新的图片", String.valueOf(results), NOTI_CODE_NEW_PHOTO);
-
-    }
-
-    // save image
-    private String saveImage(String type, Bitmap bitmap) {
-        FileOutputStream b = null;
-        // save images to this location
-        File file = new File(Config.location);
-        // 创建文件夹 @ Config.location
-        file.mkdirs();
-        String str = null;
-        Date date = null;
-        // 获取当前时间，进一步转化为字符串
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-        date = new Date();
-        str = format.format(date);
-        String fileName = Config.location + str + ".jpg";
-
-        try {
-            b = new FileOutputStream(fileName);
-            // 把数据写入文件
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, b);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                b.flush();
-                b.close();
-                // reflash the fragment of Photos
-                Config.workdone = false;
-                photos.onReflash(fileName);
-                Config.workdone = false;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                File imagePath = new File(Environment.getExternalStorageDirectory(), "tmp");
-                newFile = new File(imagePath, "default_image.jpg");
-                newFile.delete();
-                Log.d("Delete", "True");
-            } catch (Exception e) {
-                Log.e("Delete", "Error");
-            }
-        }
-        return fileName;
-    }
-
     //UI组件初始化与事件绑定
     private void bindViews() {
         // 定位textview
@@ -464,28 +234,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (albums != null) fragmentTransaction.hide(albums);
     }
 
-    /**
-     * 监听textview的按钮事件
-     *
-     * @param v
-     */
-
     @Override
     public void onClick(View v) {
-
         fTransaction = fManager.beginTransaction();
         hideAllFragment(fTransaction);
         switch (v.getId()) {
             // 照片
             case R.id.all_photos:
-                // set ActionBar tile && set no click action
-                //  actionBar.setDisplayHomeAsUpEnabled(false);
-//                actionBar.setTitle("照片");
                 tv_main_topbar.setText("照片");
                 setSelected();
                 txt_photos.setSelected(true);
                 // 暂时使用弹出堆栈，以避免从相簿进入相册无法返回
                 // 可以使用其他方法，这个方法不好，下面相同
+                // https://blog.csdn.net/qq_35988274/article/details/100518346
                 getFragmentManager().popBackStack();
                 if (photos == null) {
                     photos = new Photos(topicId);
@@ -493,17 +254,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     fTransaction.show(photos);
                 }
-
                 break;
-
             // 相册
             case R.id.all_albums:
-
-                // same as photos
-//                actionBar.setDisplayHomeAsUpEnabled(false);
-//                actionBar.setTitle("相册");
                 tv_main_topbar.setText("相册");
-
                 setSelected();
                 txt_albums.setSelected(true);
                 getFragmentManager().popBackStack();

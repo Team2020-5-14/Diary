@@ -8,7 +8,6 @@ package com.ynu.diary.album;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ynu.diary.album.utils.ImagesScaner.getAlbumPhotos;
-import static com.ynu.diary.album.utils.ImagesScaner.updateGallery;
 import static com.ynu.diary.shared.FileManager.DIARY_ROOT_DIR;
 
 // 导入相片的元素（一个照片）
@@ -53,7 +51,7 @@ public class Photos extends Fragment {
 
     private long topicId;
 
-    // 空的构造函数
+    // topicId
     @SuppressLint("ValidFragment")
     public Photos(long topicId) {
         this.type = null;
@@ -124,10 +122,9 @@ public class Photos extends Fragment {
     }
 
     // refresh datas
-    public void onReflash(String fileName) {
+    public void onReflash() {
         // in this class we can update UI
-        new UpdateGridView(fileName).execute();
-
+//        new UpdateGridView(fileName).execute();
     }
 
     // 初始化照片数组
@@ -136,14 +133,7 @@ public class Photos extends Fragment {
         if (type == null) {
             Log.d("PHO:topicID", String.valueOf(topicId));
             loadDiaryImageData(topicId, -1);
-
-//            final List<Map> mediaImageInfo;
-//            mediaImageInfo = getMediaImageInfo(getActivity().getApplicationContext());
-
             for (String url : diaryPhotoFileList) {
-//            for (Map<String, String> map : mediaImageInfo) {
-                // in this map, the key of url is _data
-//                String url = map.get("_data");
                 if (url != null) {
                     photo = new PhotoItem(url);
                     photoList.add(photo);
@@ -192,50 +182,49 @@ public class Photos extends Fragment {
     }
 
     // update gridview
-    class UpdateGridView extends AsyncTask<String, String, String> {
-        // get url of new image
-        private String fileName;
-
-        UpdateGridView(String fileName) {
-            this.fileName = fileName;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                // update db
-
-
-                updateGallery(getActivity().getApplicationContext(), fileName);
-
-                // we don't know the time when update db is end (it works in another thread)
-                // so now i set a time to wait it finished (it is a bad way)
-                while (!Config.workdone) {
-                    Thread.sleep(10);
-                }
-                // clear list
-                photoList.clear();
-                // get photo
-                initPhoto();
-
-                Log.d("rescan image: ", "finished");
-
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // TODO Auto-generated method stub
-            Log.d("update gridview: ", "start");
-            // update photo list
-            adapter.notifyDataSetChanged();
-        }
-    }
-
+//    class UpdateGridView extends AsyncTask<String, String, String> {
+//        // get url of new image
+//        private String fileName;
+//
+//        UpdateGridView(String fileName) {
+//            this.fileName = fileName;
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//            try {
+//                // update db
+//
+//
+//                updateGallery(getActivity().getApplicationContext(), fileName);
+//
+//                // we don't know the time when update db is end (it works in another thread)
+//                // so now i set a time to wait it finished (it is a bad way)
+//                while (!Config.workdone) {
+//                    Thread.sleep(10);
+//                }
+//                // clear list
+//                photoList.clear();
+//                // get photo
+//                initPhoto();
+//
+//                Log.d("rescan image: ", "finished");
+//
+//            } catch (Exception e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            // TODO Auto-generated method stub
+//            Log.d("update gridview: ", "start");
+//            // update photo list
+//            adapter.notifyDataSetChanged();
+//        }
+//    }
 }
 
 
