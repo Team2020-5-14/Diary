@@ -11,16 +11,17 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.ynu.diary.R;
 import com.ynu.diary.album.adapter.PhotoTypeAdapter;
 import com.ynu.diary.album.view.GlideRoundTransform;
+import com.ynu.diary.shared.ThemeManager;
+import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
 
 import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
@@ -38,7 +39,7 @@ import java.util.Map;
  * Created by me on 16-12-31.
  */
 
-public class PhotoInfoActivity extends AppCompatActivity {
+public class PhotoInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
     // which image you are seeing
     private String url;
@@ -50,6 +51,9 @@ public class PhotoInfoActivity extends AppCompatActivity {
     private Map<String, String> image_info;
     private TensorFlowImageClassifier classifier;
 
+    // topbar
+    private ImageView iv_photo_info_back;
+    private TextView tv_photo_info_bar;
 
     public PhotoInfoActivity() {
 
@@ -58,11 +62,19 @@ public class PhotoInfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // ui界面最上边的动作栏
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("");
+//        // ui界面最上边的动作栏
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setTitle("");
         // 生成布局
         setContentView(R.layout.photo_info);
+
+        iv_photo_info_back = (ImageView) findViewById(R.id.iv_photo_info_back);
+        iv_photo_info_back.setOnClickListener(this);
+        iv_photo_info_back.setColorFilter(ThemeManager.getInstance().getThemeDarkColor(this));
+        tv_photo_info_bar = (TextView) findViewById(R.id.tv_photo_info_bar);
+        tv_photo_info_bar.setTextColor(ThemeManager.getInstance().getThemeDarkColor(this));
+        //For set status bar
+        ChinaPhoneHelper.setStatusBar(this, true);
         // get intent information
         getMessage();
         // try to init the tf
@@ -130,38 +142,6 @@ public class PhotoInfoActivity extends AppCompatActivity {
         new UpdateListView().execute();
     }
 
-    /**
-     * 生成动作栏上的菜单项目
-     *
-     * @param menu
-     * @return
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_about, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    /**
-     * 监听菜单栏目的动作，当按下不同的按钮执行相应的动作
-     *
-     * @param item
-     * @return
-     */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // 返回
-                this.finish();
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     // if use intent to start this activity, you should use this method to get args
     // the args will be used to confirm which image should be showed
     protected void getMessage() {
@@ -223,6 +203,17 @@ public class PhotoInfoActivity extends AppCompatActivity {
         // get results
         results = classifier.recognizeImage(newbm);
         Log.d("Result", String.valueOf(results));
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_photo_info_back:
+                this.finish();
+                break;
+            default:
+                break;
+        }
     }
 
     // update UI in this class

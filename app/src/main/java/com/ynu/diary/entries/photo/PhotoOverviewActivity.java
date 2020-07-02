@@ -7,11 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ynu.diary.R;
 import com.ynu.diary.shared.FileManager;
+import com.ynu.diary.shared.ThemeManager;
+import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ import static com.ynu.diary.shared.FileManager.DIARY_ROOT_DIR;
  * Created by daxia on 2017/4/12.
  */
 
-public class PhotoOverviewActivity extends AppCompatActivity {
+public class PhotoOverviewActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     public final static String PHOTO_OVERVIEW_TOPIC_ID = "PHOTOOVERVIEW_TOPIC_ID";
@@ -41,6 +45,8 @@ public class PhotoOverviewActivity extends AppCompatActivity {
     @BindView(R.id.RL_diary_photo_overview_no_images)
     RelativeLayout RLDiaryPhotoOverviewNoImages;
 
+    private ImageView iv_photo_detail_back;
+    private TextView tv_photo_detail_bar;
     /**
      * The topic info
      */
@@ -52,6 +58,14 @@ public class PhotoOverviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_phoho_overview);
         ButterKnife.bind(this);
+
+        iv_photo_detail_back = (ImageView) findViewById(R.id.iv_photo_detail_back);
+        iv_photo_detail_back.setOnClickListener(this);
+        iv_photo_detail_back.setColorFilter(ThemeManager.getInstance().getThemeDarkColor(this));
+        tv_photo_detail_bar = (TextView) findViewById(R.id.tv_photo_detail_bar);
+        tv_photo_detail_bar.setTextColor(ThemeManager.getInstance().getThemeDarkColor(this));
+        //For set status bar
+        ChinaPhoneHelper.setStatusBar(this, true);
         //get topic id
         long topicId = getIntent().getLongExtra(PHOTO_OVERVIEW_TOPIC_ID, -1);
         //get topic fail , close this activity
@@ -119,4 +133,14 @@ public class PhotoOverviewActivity extends AppCompatActivity {
         RVDiaryPhotoOverview.setHasFixedSize(false);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_photo_detail_back:
+                this.finish();
+                break;
+            default:
+                break;
+        }
+    }
 }

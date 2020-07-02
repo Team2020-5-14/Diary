@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +27,8 @@ import android.widget.Toast;
 import com.ynu.diary.R;
 import com.ynu.diary.album.dao.MyDatabaseOperator;
 import com.ynu.diary.shared.FileManager;
+import com.ynu.diary.shared.ThemeManager;
+import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
 
 import org.tensorflow.demo.TensorFlowImageClassifier;
 
@@ -70,6 +71,10 @@ public class WelcomeActivity extends AppCompatActivity {
     private TextView textView = null;
     private TextView textViewTitle = null;
     private ProgressBar pbar;
+
+    private ThemeManager themeManager;
+
+
     @SuppressLint("HandlerLeak")
     private Handler myHandler = new Handler() {
         @Override
@@ -109,11 +114,12 @@ public class WelcomeActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        getSupportActionBar().hide();
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_welcome);
+
+        //For set status bar
+        ChinaPhoneHelper.setStatusBar(this, true);
+        themeManager = ThemeManager.getInstance();
+
         textView = (TextView) findViewById(R.id.work_process);
         textViewTitle = (TextView) findViewById(R.id.app_title);
         pbar = (ProgressBar) findViewById(R.id.progressBar);
@@ -399,7 +405,7 @@ public class WelcomeActivity extends AppCompatActivity {
      */
     private void do_finishThisActivity() {
         pbar.setVisibility(pbar.GONE);
-        textView.setText("尽情享受吧");
+        textView.setText("图片智能分类完成");
         //setAppName();
         final Intent it = new Intent(getApplication(), MainActivity.class); //你要转向的Activity
 //        it.putExtra(MainActivity.PHOTO_OVERVIEW_TOPIC_ID, topicId);
@@ -420,7 +426,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void setAppName() {
         textViewTitle.setText("图片智能分类中");
         textViewTitle.setTextSize(32);
-        textViewTitle.setTextColor(Color.rgb(140, 21, 119));
+        textViewTitle.setTextColor(themeManager.getThemeMainColor(this));
     }
 
     /**

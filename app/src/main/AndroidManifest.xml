@@ -62,7 +62,7 @@
         <activity
             android:name="com.ynu.diary.entries.photo.PhotoOverviewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme_NoActionBar_FullScreen" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.ynu.diary.entries.photo.PhotoDetailViewerActivity"
             android:screenOrientation="portrait" />

@@ -1,6 +1,5 @@
 package com.ynu.diary.album;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -27,22 +26,20 @@ import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ynu.diary.R;
 import com.ynu.diary.album.dao.MyDatabaseHelper;
 import com.ynu.diary.album.dao.MyDatabaseOperator;
+import com.ynu.diary.shared.ThemeManager;
+import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
 
 import org.tensorflow.demo.Classifier;
 import org.tensorflow.demo.TensorFlowImageClassifier;
@@ -88,9 +85,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private NotificationManager manager;
 
     private TensorFlowImageClassifier classifier;
+    private ThemeManager themeManager;
 
-    // actionBar
-//    public static android.support.v7.app.ActionBar actionBar;
+    // topbar
+    private ImageView iv_main_back;
+    private TextView tv_main_topbar;
+
     // fragment
     private FragmentTransaction fTransaction;
     private boolean havaInAlbum = false;
@@ -127,6 +127,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("MAIN:diaryId", String.valueOf(diaryId));
 
         setContentView(R.layout.activity_main_n);
+        tv_main_topbar = (TextView) findViewById(R.id.tv_main_topbar);
+        tv_main_topbar.setTextColor(ThemeManager.getInstance().getThemeDarkColor(this));
+        iv_main_back = (ImageView) findViewById(R.id.iv_main_back);
+        iv_main_back.setOnClickListener(this);
+        iv_main_back.setColorFilter(ThemeManager.getInstance().getThemeDarkColor(this));
+        //For set status bar
+        ChinaPhoneHelper.setStatusBar(this, true);
+        themeManager = ThemeManager.getInstance();
+
         manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 //        actionBar = getSupportActionBar();
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -234,68 +243,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }).start();
         }
     }
-
-    /**
-     * ActionBar
-     *
-     * @param menu
-     * @return
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        // search item
-//        MenuItem searchItem = menu.findItem(R.id.action_search);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    /**
-     * 监听菜单栏目的动作，当按下不同的按钮执行相应的动作
-     *
-     * @param item
-     * @return
-     */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // 返回
-                System.out.println("title");
-                getFragmentManager().popBackStack();
-//                actionBar.setDisplayHomeAsUpEnabled(false);
-//                actionBar.setTitle(" 相册");
-                break;
-//            case R.id.action_search:
-//                // 搜索
-//                System.out.println("search");
-//                break;
-            case R.id.action_camera:
-                // 拍照
-                if (Build.VERSION.SDK_INT >= 23) {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.CAMERA},
-                                PERMISSION_REQUEST_CAMERA);
-                    } else {
-                        startCamera();
-                    }
-                } else {
-                    startCamera();
-                }
-                break;
-            case R.id.action_voice:
-                Intent intent = new Intent(MainActivity.this, MapActivity.class);
-
-                startActivity(intent);
-                break;
-            // 语音
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 
     /**
      * do it after require permission
@@ -530,11 +477,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hideAllFragment(fTransaction);
         switch (v.getId()) {
             // 照片
-
             case R.id.all_photos:
                 // set ActionBar tile && set no click action
-//                actionBar.setDisplayHomeAsUpEnabled(false);
+                //  actionBar.setDisplayHomeAsUpEnabled(false);
 //                actionBar.setTitle("照片");
+                tv_main_topbar.setText("照片");
                 setSelected();
                 txt_photos.setSelected(true);
                 // 暂时使用弹出堆栈，以避免从相簿进入相册无法返回
@@ -555,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // same as photos
 //                actionBar.setDisplayHomeAsUpEnabled(false);
 //                actionBar.setTitle("相册");
+                tv_main_topbar.setText("相册");
 
                 setSelected();
                 txt_albums.setSelected(true);
@@ -567,6 +515,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     fTransaction.show(albums);
                 }
                 havaInAlbum = true;
+                break;
+            case R.id.iv_main_back:
+                this.finish();
                 break;
         }
         fTransaction.commit();

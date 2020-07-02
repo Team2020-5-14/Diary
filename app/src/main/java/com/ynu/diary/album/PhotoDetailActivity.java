@@ -9,29 +9,23 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ynu.diary.R;
 import com.ynu.diary.album.adapter.HorizontalScrollViewAdapter;
 import com.ynu.diary.album.view.MyHorizontalScrollView;
-import com.ynu.diary.album.view.MyHorizontalScrollView.CurrentImageChangeListener;
-import com.ynu.diary.album.view.MyHorizontalScrollView.OnItemClickListener;
 import com.ynu.diary.shared.FileManager;
+import com.ynu.diary.shared.ThemeManager;
+import com.ynu.diary.shared.statusbar.ChinaPhoneHelper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static com.ynu.diary.album.utils.ImagesScaner.getAlbumPhotos;
 import static com.ynu.diary.shared.FileManager.DIARY_ROOT_DIR;
@@ -45,7 +39,7 @@ import static com.ynu.diary.shared.FileManager.DIARY_ROOT_DIR;
 // some method may be used about db or others
 // adapter && view
 
-public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnClickListener */ {
+public class PhotoDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     public final static String PHOTO_OVERVIEW_TOPIC_ID = "PHOTOOVERVIEW_TOPIC_ID";
     public final static String PHOTO_OVERVIEW_DIARY_ID = "PHOTOOVERVIEW_DIARY_ID";
@@ -61,11 +55,6 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
     String url = null;
     // has been init
     boolean init = false;
-    // 初始化几个textview， 可以点击并且出发事件
-    private TextView txt_back;
-    //    private TextView txt_share;
-    private TextView txt_love;
-    private TextView txt_delete;
     // 自定义的布局， 实现下面缩略图，上面大图
     private MyHorizontalScrollView mHorizontalScrollView;
     // 适配器
@@ -73,10 +62,14 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
     private ImageView mImg;
     // 照片数组。照片在drawable文件夹中，名字为a.png ...
     private List<Map> mDatas;
-    private PhotoViewAttacher mAttacher;
     private String type = null;
 
     private int position_tmp;
+    private int count;
+
+    // topbar
+    private ImageView iv_photo_detail_back;
+    private ImageView iv_photo_info;
 
     private Handler myHandler = new Handler() {
         @Override
@@ -109,8 +102,14 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.fg_detail);
+        ChinaPhoneHelper.setStatusBar(this, true);
+        iv_photo_detail_back = (ImageView) findViewById(R.id.iv_photo_detail_back);
+        iv_photo_info = (ImageView) findViewById(R.id.iv_photo_info);
+        iv_photo_detail_back.setColorFilter(ThemeManager.getInstance().getThemeDarkColor(this));
+        iv_photo_info.setColorFilter(ThemeManager.getInstance().getThemeDarkColor(this));
+        iv_photo_detail_back.setOnClickListener(this);
+        iv_photo_info.setOnClickListener(this);
 
         //get topic id
         topicId = getIntent().getLongExtra(PHOTO_OVERVIEW_TOPIC_ID, -1);
@@ -152,18 +151,18 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
             }
             mDatas = result;
         }
+        count = mDatas.size();
         //Load the data
 //            loadDiaryImageData(topicId, diaryId);
 //        mDatas = getMediaImageInfo(this.getBaseContext());
         mImg = (ImageView) findViewById(R.id.id_content);
-//        mAttacher = new PhotoViewAttacher(mImg);
-        Glide.with(PhotoDetailActivity.this).load((String) mDatas.get(position_now).get("_data")).into(mImg);
 
+        Glide.with(PhotoDetailActivity.this).load((String) mDatas.get(position_now).get("_data")).into(mImg);
         mHorizontalScrollView = (MyHorizontalScrollView) findViewById(R.id.id_horizontalScrollView);
         mAdapter = new HorizontalScrollViewAdapter(this, mDatas);
         //添加滚动回调
         mHorizontalScrollView
-                .setCurrentImageChangeListener(new CurrentImageChangeListener() {
+                .setCurrentImageChangeListener(new MyHorizontalScrollView.CurrentImageChangeListener() {
                     @Override
                     public void onCurrentImgChanged(int position,
                                                     View viewIndicator) {
@@ -183,13 +182,18 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
                     }
                 });
         //添加点击回调
-        mHorizontalScrollView.setOnItemClickListener(new OnItemClickListener() {
+        mHorizontalScrollView.setOnItemClickListener(new MyHorizontalScrollView.OnItemClickListener() {
 
             @Override
             public void onClick(View view, int position) {
-                mImg.setImageURI(Uri.fromFile(new File((String) mDatas.get(position).get("_data"))));
-
-                view.setBackgroundColor(Color.parseColor("#AA024DA4"));
+                if (position >= count) {
+                    ;
+                } else {
+                    if (mDatas.get(position) != null) {
+                        mImg.setImageURI(Uri.fromFile(new File((String) mDatas.get(position).get("_data"))));
+                        view.setBackgroundColor(Color.parseColor("#AA024DA4"));
+                    }
+                }
             }
         });
         //设置适配器
@@ -241,56 +245,13 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
         Log.d("Test-----------------: ", "" + position_now + " " + url);
     }
 
-    //UI组件初始化与事件绑定
-    private void bindViews() {
-        // 返回删除等按钮
-//        txt_back = (TextView) findViewById(R.id.back);
-//        txt_share = (TextView) findViewById(R.id.share);
-//        txt_love = (TextView) findViewById(R.id.love);
-//        txt_delete = (TextView) findViewById(R.id.delete);
-        // 设置监听
-//        txt_back.setOnClickListener(this);
-//        txt_share.setOnClickListener(this);
-//        txt_love.setOnClickListener(this);
-//        txt_delete.setOnClickListener(this);
-    }
-
-    // 恢复点击状态为未点击状态
-    private void setSelect() {
-//        txt_back.setSelected(false);
-//        txt_share.setSelected(false);
-//        txt_love.setSelected(false);
-//        txt_delete.setSelected(false);
-    }
-
-    /**
-     * 生成动作栏上的菜单项目
-     *
-     * @param menu
-     * @return
-     */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_for_detail, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    /**
-     * 监听菜单栏目的动作，当按下不同的按钮执行相应的动作
-     *
-     * @param item
-     * @return
-     */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // 返回
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_photo_detail_back:
                 this.finish();
                 break;
-            case R.id.action_about:
-                // go to PhotoInfoActivity
+            case R.id.iv_photo_info:
                 Intent intent = new Intent(this, PhotoInfoActivity.class);
                 int position;
                 if (!init) {
@@ -303,44 +264,6 @@ public class PhotoDetailActivity extends AppCompatActivity /*implements View.OnC
                 intent.putExtra("url", (String) mDatas.get(position).get("_data"));
                 startActivity(intent);
                 break;
-
-            default:
-                break;
         }
-        return super.onOptionsItemSelected(item);
     }
-    // 下面按钮（返回删除等）的点击动作
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()){
-//            // 返回
-//            case R.id.back:
-//                setSelect();
-//                txt_back.setSelected(true);
-//                System.out.println("1");
-//                PhotoDetailActivity.this.finish(); // 结束当前的activity， 返回上一个界面
-//                break;
-////            case R.id.share: // 分享
-////                setSelect();
-////                txt_share.setSelected(true);
-////                System.out.println("2");
-////
-////                break;
-//            case R.id.love: // 喜爱
-//                setSelect();
-//                txt_love.setSelected(true);
-//                System.out.println("3");
-//
-//                break;
-////            case R.id.delete: // 删除
-////                setSelect();
-////                txt_delete.setSelected(true);
-////
-////                txt_delete.setSelected(false);
-////                System.out.println("4");
-////
-////                break;
-//        }
-//    }
-
 }
