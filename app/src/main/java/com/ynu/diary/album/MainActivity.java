@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 //            case R.id.action_search:
 //                // 搜索
-//               System.out.println("search");
+//                System.out.println("search");
 //                break;
             case R.id.action_camera:
                 // 拍照

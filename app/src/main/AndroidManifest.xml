@@ -103,14 +103,32 @@
         </activity>
 
 
-        <activity android:name="com.ynu.diary.album.WelcomeActivity"></activity>
+        <activity
+            android:name="com.ynu.diary.album.WelcomeActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
         <activity
             android:name="com.ynu.diary.album.MovieShowActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name="com.ynu.diary.album.MainActivity"></activity>
-        <activity android:name="com.ynu.diary.album.PhotoDetailActivity"></activity>
-        <activity android:name="com.ynu.diary.album.MapActivity"></activity>
-        <activity android:name="com.ynu.diary.album.PhotoInfoActivity"></activity>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name="com.ynu.diary.album.MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="com.ynu.diary.album.PhotoDetailActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="com.ynu.diary.album.MapActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="com.ynu.diary.album.PhotoInfoActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
 
         <service android:name="com.amap.api.location.APSService" />
 

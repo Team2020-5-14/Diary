@@ -21,8 +21,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,9 +109,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        getSupportActionBar().hide();
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_welcome);
         textView = (TextView) findViewById(R.id.work_process);
@@ -298,8 +296,8 @@ public class WelcomeActivity extends AppCompatActivity {
             if (!file.exists()) {
                 Log.d("FileExists?", "no");
                 // had been deleted, erase it in db
-                operator.erase("AlbumPhotos", "url = ?", new String[]{"'" + url + "'"});
-                operator.erase("TFInformation", "url = ?", new String[]{"'" + url + "'"});
+                int a = operator.erase("AlbumPhotos", "url = ?", new String[]{url});
+                operator.erase("TFInformation", "url = ?", new String[]{url});
             }
 //            findResult = operator.search("AlbumPhotos", "url = '" + url + "'");
 //            if (findResult.size() == 0) {
@@ -320,7 +318,7 @@ public class WelcomeActivity extends AppCompatActivity {
             findResult = operator.search("AlbumPhotos", "album_name = '" + album_name + "'");
             if (findResult.size() == 0) {
                 // had been deleted, erase it in db
-                operator.erase("Album", "album_name = ?", new String[]{"'" + album_name + "'"});
+                operator.erase("Album", "album_name = ?", new String[]{album_name});
             } else {
                 // not be deleted, do nothing
             }
