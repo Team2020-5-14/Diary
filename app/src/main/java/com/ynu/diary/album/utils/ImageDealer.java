@@ -76,26 +76,29 @@ public class ImageDealer {
         if (results == null) return;
         List<Map> findResult;
         for (Classifier.Recognition cr : results) {
-            String type = cr.getTitle();
-            // AlbumPhotos
-            value.clear();
-            value.put("album_name", type);
-            value.put("url", image);
-            operator.insert("AlbumPhotos", value);
-            // Album
-            findResult = operator.search("Album", "album_name = '" + type + "'");
-            if (findResult.size() == 0) {
+            // 自信值要大于0.2才采纳
+            if (cr.getConfidence() > 0.20) {
+                String type = cr.getTitle();
+                // AlbumPhotos
                 value.clear();
                 value.put("album_name", type);
-                value.put("show_image", image);
-                operator.insert("Album", value);
+                value.put("url", image);
+                operator.insert("AlbumPhotos", value);
+                // Album
+                findResult = operator.search("Album", "album_name = '" + type + "'");
+                if (findResult.size() == 0) {
+                    value.clear();
+                    value.put("album_name", type);
+                    value.put("show_image", image);
+                    operator.insert("Album", value);
+                }
+                //TFInfromation
+                value.clear();
+                value.put("url", image);
+                value.put("tf_type", type);
+                value.put("confidence", cr.getConfidence());
+                operator.insert("TFInformation", value);
             }
-            //TFInfromation
-            value.clear();
-            value.put("url", image);
-            value.put("tf_type", type);
-            value.put("confidence", cr.getConfidence());
-            operator.insert("TFInformation", value);
         }
     }
 

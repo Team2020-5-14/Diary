@@ -322,7 +322,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     Log.d("FileExists?", "no");
                     // album_show_image had been deleted
                     ContentValues contentValues = new ContentValues();
-                    contentValues.put("show_image", findResult.get(1).get("url").toString());
+                    contentValues.put("show_image", findResult.get(0).get("url").toString());
                     operator.update("Album", contentValues, "album_name = ?", new String[]{album_name});
                 }
             }
