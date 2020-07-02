@@ -31,12 +31,9 @@ import static com.ynu.diary.album.utils.ImagesScaner.getAlbumInfo;
  */
 
 public class Albums extends Fragment {
-    private String content;
     private FragmentManager manager;
     private FragmentTransaction ft;
     private AlbumAdapter adapter;
-    private String[] data = {"ALBUMS", "Banana", "Orange", "Watermelon",
-            "Pear", "Grape", "Pineapple", "Strawberry", "Cherry", "Mango"};
     private List<AlbumItem> albumList = new ArrayList<AlbumItem>();
     private List<Map<String, String>> result;
 
@@ -66,13 +63,6 @@ public class Albums extends Fragment {
                 ft = manager.beginTransaction();
                 ft.add(R.id.ly_content, myJDEditFragment);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                try {
-//                    android.support.v7.app.ActionBar actionBar = MainActivity.actionBar;
-//                    actionBar.setDisplayHomeAsUpEnabled(true);
-//                    actionBar.setTitle("");
-                } catch (Exception e) {
-                    ;
-                }
                 ft.addToBackStack(null);
                 ft.commit();
             }

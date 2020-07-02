@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.ynu.diary.R;
 import com.ynu.diary.album.entity.AlbumItem;
-import com.ynu.diary.album.view.GlideRoundTransform;
 
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class AlbumAdapter extends ArrayAdapter<AlbumItem> {
         if (convertView == null) {
             holder = new ViewHolder();
             convertView = LayoutInflater.from(getContext()).inflate(resourceId, null);
-            holder.img = (ImageView) (ImageView) convertView.findViewById(R.id.album_image);
+            holder.img = (ImageView) convertView.findViewById(R.id.album_image);
             holder.tv = (TextView) convertView.findViewById(R.id.album_name);
             convertView.setTag(holder);
         } else {
@@ -57,7 +56,6 @@ public class AlbumAdapter extends ArrayAdapter<AlbumItem> {
                 .placeholder(R.drawable.loading)
                 .error(R.drawable.error)
                 .crossFade()
-                .transform(new GlideRoundTransform(context))
                 .thumbnail(0.1f).into(holder.img);
         return convertView;
     }

@@ -300,22 +300,13 @@ public class WelcomeActivity extends AppCompatActivity {
             if (!file.exists()) {
                 Log.d("FileExists?", "no");
                 // had been deleted, erase it in db
-                int a = operator.erase("AlbumPhotos", "url = ?", new String[]{url});
+                operator.erase("AlbumPhotos", "url = ?", new String[]{url});
                 operator.erase("TFInformation", "url = ?", new String[]{url});
             }
-//            findResult = operator.search("AlbumPhotos", "url = '" + url + "'");
-//            if (findResult.size() == 0) {
-//                // had been deleted, erase it in db
-//                operator.erase("AlbumPhotos", "url = ?", new String[]{"'" + url + "'"});
-//                operator.erase("TFInformation", "url = ?", new String[]{"'" + url + "'"});
-//            } else {
-//                // not be deleted, do nothing
-//            }
         }
-        List<Map> imagesInDB2 = operator.search("AlbumPhotos");
-
         // for every album in db
         String album_name;
+        String album_show_image;
         List<Map> typeInAlbum = operator.search("Album");
         for (Map<String, String> albumInfo : typeInAlbum) {
             album_name = albumInfo.get("album_name");
@@ -325,6 +316,15 @@ public class WelcomeActivity extends AppCompatActivity {
                 operator.erase("Album", "album_name = ?", new String[]{album_name});
             } else {
                 // not be deleted, do nothing
+                album_show_image = albumInfo.get("show_image");
+                File file = new File(album_show_image);
+                if (!file.exists()) {
+                    Log.d("FileExists?", "no");
+                    // album_show_image had been deleted
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("show_image", findResult.get(1).get("url").toString());
+                    operator.update("Album", contentValues, "album_name = ?", new String[]{album_name});
+                }
             }
         }
         operator.close();
