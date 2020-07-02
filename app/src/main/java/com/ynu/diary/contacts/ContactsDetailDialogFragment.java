@@ -119,7 +119,8 @@ public class ContactsDetailDialogFragment extends DialogFragment implements View
         contactsId = getArguments().getLong("contactsId", -1);
         if (contactsId == ADD_NEW_CONTACTS) {
             isEditMode = false;
-            But_contacts_detail_delete.setVisibility(View.GONE);
+            But_contacts_detail_delete.setEnabled(false);
+//            But_contacts_detail_delete.setVisibility(View.GONE);
 
             topicId = getArguments().getLong("topicId", -1);
         } else {
@@ -133,7 +134,6 @@ public class ContactsDetailDialogFragment extends DialogFragment implements View
             EDT_contacts_detail_phone_number.setText(contactsPhoneNumber);
         }
     }
-
 
 
     private void addContacts() {

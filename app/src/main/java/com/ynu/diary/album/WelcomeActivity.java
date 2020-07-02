@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,7 +16,6 @@ import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ProgressBar;
@@ -349,25 +347,30 @@ public class WelcomeActivity extends AppCompatActivity {
             do_byLevel(level);
         } catch (Exception e) {
             // is first open this application
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(WelcomeActivity.this);
-            builder.setTitle("选择图片处理的时间");
-            builder.setIcon(R.drawable.things);
-            builder.setItems(actions, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    final MyDatabaseOperator operator = new MyDatabaseOperator(WelcomeActivity.this, Config.DB_NAME, Config.dbversion);
-                    ContentValues values = new ContentValues();
-                    values.put("notFirstIn", "true");
-                    values.put("updateTime", which);
-                    operator.insert("Settings", values);
-                    operator.close();
-                    Toast.makeText(WelcomeActivity.this, actions[which], Toast.LENGTH_SHORT).show();
-                    do_byLevel(which);
-                }
-            });
-
-            builder.show();
+            ContentValues values = new ContentValues();
+            values.put("notFirstIn", "true");
+            values.put("updateTime", 0);
+            operator.insert("Settings", values);
+            do_byLevel(0);
+            // 0:全部进入APP时处理
+//            AlertDialog.Builder builder = new AlertDialog.Builder(WelcomeActivity.this);
+//            builder.setTitle("选择图片处理的时间");
+//            builder.setIcon(R.drawable.things);
+//            builder.setItems(actions, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    final MyDatabaseOperator operator = new MyDatabaseOperator(WelcomeActivity.this, Config.DB_NAME, Config.dbversion);
+//                    ContentValues values = new ContentValues();
+//                    values.put("notFirstIn", "true");
+//                    values.put("updateTime", which);
+//                    operator.insert("Settings", values);
+//                    operator.close();
+//                    Toast.makeText(WelcomeActivity.this, actions[which], Toast.LENGTH_SHORT).show();
+//                    do_byLevel(which);
+//                }
+//            });
+//
+//            builder.show();
         }
         operator.close();
     }
@@ -425,8 +428,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void setAppName() {
         textViewTitle.setText("图片智能分类中");
-        textViewTitle.setTextSize(32);
-        textViewTitle.setTextColor(themeManager.getThemeMainColor(this));
+        textViewTitle.setTextSize(20);
+        textViewTitle.setTextColor(themeManager.getThemeDarkColor(this));
     }
 
     /**
